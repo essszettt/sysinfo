@@ -104,6 +104,8 @@ int dumpOperatingSystem(void)
   uiValue16 = esx_m_dosversion();
   zprintf(DUMP_NOSNAME " = %u.%02u\n", "DOSVERSION", ESX_DOSVERSION_NEXTOS_MAJOR(uiValue16),
                                                      ESX_DOSVERSION_NEXTOS_MINOR(uiValue16));
+  zprintf("+ " DUMP_NOSSUB " = %s\n", "MODE", (0x0000 == uiValue16 ? "48K" : "128K/NEXT"));
+
   // Date & Time
   struct dos_tm tRaw;
   if (0 == esx_m_getdate(&tRaw))

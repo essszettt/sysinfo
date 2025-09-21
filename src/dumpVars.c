@@ -40,6 +40,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <errno.h>
+
 #include <arch/zxn.h>
 #include <arch/zxn/sysvar.h>
 
@@ -52,7 +53,7 @@
 /*!
 Size of the buffer to render the value of a system variable
 */
-#define VALUE_LEN_MAX (80)
+#define VALUE_LEN_MAX LINE_LEN_MAX
 
 /*============================================================================*/
 /*                               Namespaces                                   */

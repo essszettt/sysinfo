@@ -59,7 +59,6 @@
 /*                               Defines                                      */
 /*============================================================================*/
 #define END_OF_LIST (0x7FFF)
-#define LINE_LEN_MAX (128)
 
 /*============================================================================*/
 /*                               Namespaces                                   */
@@ -359,6 +358,7 @@ int parseArguments(int argc, char* argv[])
     else
     {
       snprintf(g_tState.dump.acPathName, sizeof(g_tState.dump.acPathName), "%s", acArg);
+      _normalizepath(g_tState.dump.acPathName);
     }
 
     ++i;
@@ -597,6 +597,61 @@ uint32_t _frames(uint8_t* pFrames)
 uint8_t _cpuspeed(void)
 {
   return g_tState.uiCpuSpeed;
+}
+
+
+/*----------------------------------------------------------------------------*/
+/* _normalizepath()                                                           */
+/*----------------------------------------------------------------------------*/
+int _normalizepath(unsigned char* acPath)
+{
+  int iReturn = EOK;
+
+  if (0 != acPath)
+  {
+    size_t uiIdx;
+    enum
+    {
+      STATE_CUTTING = 0,
+      STATE_IDLE
+    } eState = STATE_CUTTING;
+
+    if (0 < (uiIdx = strlen(acPath)))
+    {
+      while (0 <= uiIdx)
+      {
+        if ('\\' == acPath[uiIdx])
+        {
+          acPath[uiIdx] = '/';
+        }
+
+        if (STATE_CUTTING == eState)
+        {
+          if ('/' == acPath[uiIdx])
+          {
+            acPath[uiIdx] = '\0';
+          }
+          else
+          {
+            eState = STATE_IDLE;
+          }
+        }
+
+        if (0 == uiIdx)
+        {
+          break;
+        }
+
+        --uiIdx;
+      }
+    }
+  }
+  else
+  {
+    iReturn = EINVAL;
+  }
+
+  return iReturn;
 }
 
 

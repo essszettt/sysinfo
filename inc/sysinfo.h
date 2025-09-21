@@ -47,7 +47,6 @@
 #define EBREAK   (ERROR_SPECIFIC + 0x00)
 #define ETIMEOUT (ERROR_SPECIFIC + 0x01)
 
-
 #ifndef ERANGE
   #define ERANGE __ERANGE
   #warning "ERANGE not defined in errno.h (typo ?)"
@@ -60,7 +59,11 @@
 #define INV_FILE_HND (0xFF)
 #define ESX_DIR_SEP "/"
 
-#define MAX_LINE_LEN (80)
+/*!
+Maximaum length of a text buffer that is used to render a line of the screen
+output and the log file. 
+*/
+#define LINE_LEN_MAX (0x180)
 
 /*============================================================================*/
 /*                               Namespaces                                   */
@@ -136,6 +139,13 @@ uint8_t _cpuspeed(void);
 Internal function: Convert the 24bit-value from sysvar "FRAMES" to 32bit.
 */
 uint32_t _frames(uint8_t * pFrames);
+
+/*!
+In this function cleans up the given path ('\\' => '/', remove trailing '/' )
+@param acPath Path to clean up
+@return "0" = no error
+*/
+int _normalizepath(unsigned char* acPath);
 
 /*============================================================================*/
 /*                               Klassen                                      */
