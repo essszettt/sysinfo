@@ -6,7 +6,7 @@ The application is implemented as a DOT-command and can be called directly from 
 
 ---
 
-## Usage
+## USAGE
 
 SYSINFO - System Info ZX Spectrum Next
 
@@ -22,7 +22,7 @@ SYSINFO - System Info ZX Spectrum Next
 
 ---
 
-## Examples
+## EXAMPLES
 
 #### .sysinfo
 
@@ -39,3 +39,9 @@ Show only registervalues on the screen and save it in with the given pathname
 #### .sysinfo /home/tmp -t rv -q
 
 Save registervalues and systemvariables with default name in the given directory without output on screen
+
+---
+## REMARKS
+
+Compiling the app takes very long time because of nested "switch-case" and many small strings, that needs to be "pooled" ...
+Setting "--max-allocs-per-node" to "4000" instead of "200000" improves that dramatically ;-) ...
