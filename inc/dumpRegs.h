@@ -71,7 +71,7 @@
 typedef struct _regentry
 {
   const uint8_t uiNumber;
-  const bool bVisible;
+  const uint8_t uiFLags;
   const unsigned char* acName;
 } regentry_t;
 

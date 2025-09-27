@@ -242,7 +242,7 @@ int dumpVariables(void)
     uint32_t uiRaw32;
   } value;
   
-  zprintf("--- SYSTEM VARIABLES -----------\n");
+  zheader("SYSTEM VARIABLES");
 
   const varentry_t* pVar = &g_tVariables[0];
   while (0 != pVar->acName)
@@ -252,7 +252,7 @@ int dumpVariables(void)
     switch (pVar->uiSize)
     {
       case 0:
-        snprintf(g_acValue, sizeof(g_acValue), "%s", "NIL");
+        snprintf(g_acValue, sizeof(g_acValue), "%s", "null");
         break;
 
       case 1:
@@ -272,7 +272,7 @@ int dumpVariables(void)
           }
           else
           {
-            snprintf(g_acValue, sizeof(g_acValue), "(%s)", "nil");
+            snprintf(g_acValue, sizeof(g_acValue), "(%s)", "null");
           }
         }
         else
@@ -296,6 +296,13 @@ int dumpVariables(void)
 
     switch (pVar->uiAddress)
     {
+      case 0x5B69: /* MAXBNK */
+        {
+          uint32_t uiValue = UINT32_C(0x4000) * ((uint32_t) value.uiRaw8[0] + 1);
+          zprintf("   + " DUMP_VARSUB " = %lu (0x%lX)\n", "RAMSIZE", uiValue, uiValue);
+        }
+        break;
+
       case 0x5C41: /* MODE */
         {
           const unsigned char* acModes[] = {"C|K|L", "E", "G", ""};
@@ -324,6 +331,10 @@ int dumpVariables(void)
       case 0x5C8A: /* S_POSNL */
         zprintf("   + " DUMP_VARSUB " = %u\n", "COL", value.uiRaw8[0]);
         zprintf("   + " DUMP_VARSUB " = %u\n", "ROW", value.uiRaw8[1]);
+        break;
+
+      default:
+        break;
     }
 
     ++pVar;

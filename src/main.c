@@ -108,6 +108,11 @@ static struct _state
   uint8_t uiCpuSpeed;
 
   /*!
+  Properties of the current screen mode
+  */
+  struct esx_mode tScreen;
+
+  /*!
   Exitcode of the application, that is handovered to BASIC
   */
   int iExitCode;
@@ -118,7 +123,7 @@ static struct _state
   struct 
   {
     /*!
-    Buffer to render test output (for screen and file)
+    Buffer to render text output (for screen and file)
     */
     unsigned char acBuffer[LINE_LEN_MAX];
 
@@ -232,6 +237,12 @@ void _construct(void)
   g_tState.iExitCode     = EOK;
 
   ZXN_NEXTREG(REG_TURBO_MODE, RTM_28MHZ);
+
+  if (0 != esx_ide_mode_get(&g_tState.tScreen))
+  {
+    g_tState.tScreen.cols = 32;
+    g_tState.tScreen.rows = 24;
+  }
 
   g_tState.bInitialized  = true;
 }
@@ -469,6 +480,11 @@ static int dumpSystemInfo(void)
     }
   }
 
+  if (EOK == iReturn)
+  {
+    zheader("%s (version " VER_FILEVERSION_STR ")", strupr(VER_INTERNALNAME_STR));
+  }
+
   if (INV_FILE_HND != g_tState.dump.hFile)
   {
     esx_f_close(g_tState.dump.hFile);
@@ -517,13 +533,16 @@ int showInfo(void)
 /*----------------------------------------------------------------------------*/
 /* zprintf()                                                                  */
 /*----------------------------------------------------------------------------*/
-int zprintf(char* acFmt, ...)
+int zprintf(const unsigned char* acFmt, ...)
 {
   int iReturn = 0;
+  size_t uiLen;
 
   va_list args;
   va_start(args, acFmt);
+
   iReturn = vsnprintf(g_tState.dump.acBuffer, sizeof(g_tState.dump.acBuffer), acFmt, args);
+  uiLen   = strnlen(g_tState.dump.acBuffer, sizeof(g_tState.dump.acBuffer));
 
   if (!g_tState.bQuiet)
   {
@@ -532,12 +551,50 @@ int zprintf(char* acFmt, ...)
 
   if (INV_FILE_HND != g_tState.dump.hFile)
   {
-    size_t uiLen = strnlen(g_tState.dump.acBuffer, sizeof(g_tState.dump.acBuffer));
-
     if (uiLen != esx_f_write(g_tState.dump.hFile, g_tState.dump.acBuffer, uiLen))
     {
       iReturn = 0;
     }
+  }
+
+  return iReturn;
+}
+
+
+/*----------------------------------------------------------------------------*/
+/* _strerror()                                                                */
+/*----------------------------------------------------------------------------*/
+int zheader(const unsigned char* acFmt, ...)
+{
+  int iReturn = 0;
+
+  static unsigned char* acBuffer = 0;
+
+  va_list args;
+  va_start(args, acFmt);
+
+  if (0 == acBuffer)
+  {
+    acBuffer = malloc(g_tState.tScreen.cols + 1);
+  }
+
+  if (0 != acBuffer)
+  {
+    for (uint8_t i = 0; i < g_tState.tScreen.cols; ++i)
+    {
+      acBuffer[i] = '_';
+    }
+
+    acBuffer[g_tState.tScreen.cols] = '\0';
+    zprintf("%s", acBuffer);
+
+    if (INV_FILE_HND != g_tState.dump.hFile) /* UGLY HACK ;-) */
+    {
+      esx_f_write(g_tState.dump.hFile, "\n", 1);
+    }
+
+    iReturn = vsnprintf(acBuffer, g_tState.tScreen.cols + 1, acFmt, args);
+    zprintf("%s\n\n", acBuffer);
   }
 
   return iReturn;

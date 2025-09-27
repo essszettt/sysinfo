@@ -54,6 +54,7 @@
 
 #ifndef RTM_28MHZ
   #define RTM_28MHZ 0x03
+  #warning "RTM_28MHZ not defined in zxn.h"
 #endif
 
 #define INV_FILE_HND (0xFF)
@@ -106,6 +107,7 @@ typedef struct _errentry
 } errentry_t;
 
 /*!
+Enumeration of all categories of displayed/saved topics
 */
 typedef enum _features
 {
@@ -121,7 +123,12 @@ typedef enum _features
 Replacement for "printf". This funkction prints on the screen and dumps to
 a file.
 */
-int zprintf(char* acFmt, ...);
+int zprintf(const unsigned char* acFmt, ...);
+
+/*!
+Print a title line on the screen and the log file
+*/
+int zheader(const unsigned char* acFmt, ...);
 
 /*!
 This function returns a pointer to a textual error message for the given

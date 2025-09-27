@@ -67,12 +67,31 @@
 /*                               Typ-Definitionen                             */
 /*============================================================================*/
 /*!
+Structure to describe a single system variable
 */
 typedef struct _varentry
 {
+  /*!
+  Address of variable in memory
+  */
   const uint16_t uiAddress;
+
+  /*!
+  Size of variable in memory
+  */
   const uint8_t uiSize;
+
+  /*!
+  Flags to process the value of variable
+  @code
+  BIT7  Value is a pointer
+  @endcode
+  */
   const uint8_t uiFlags;
+
+  /*!
+  Name of variable
+  */
   const unsigned char* acName;
 } varentry_t;
 

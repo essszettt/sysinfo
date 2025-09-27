@@ -94,7 +94,7 @@ int dumpOperatingSystem(void)
   uint8_t  uiValue8;
   uint16_t uiValue16;
  
-  zprintf("--- ESXDOS/NEXTOS --------------\n");
+  zheader("ESXDOS/NEXTOS");
 
   // DOS-Version (ESXDOS) ...
   /*
