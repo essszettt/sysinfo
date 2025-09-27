@@ -537,12 +537,13 @@ int zprintf(const unsigned char* acFmt, ...)
 {
   int iReturn = 0;
   size_t uiLen;
-
   va_list args;
-  va_start(args, acFmt);
 
+  va_start(args, acFmt);
   iReturn = vsnprintf(g_tState.dump.acBuffer, sizeof(g_tState.dump.acBuffer), acFmt, args);
-  uiLen   = strnlen(g_tState.dump.acBuffer, sizeof(g_tState.dump.acBuffer));
+  va_end(args);
+
+  uiLen = strnlen(g_tState.dump.acBuffer, sizeof(g_tState.dump.acBuffer));
 
   if (!g_tState.bQuiet)
   {
@@ -567,11 +568,9 @@ int zprintf(const unsigned char* acFmt, ...)
 int zheader(const unsigned char* acFmt, ...)
 {
   int iReturn = 0;
+  va_list args;
 
   static unsigned char* acBuffer = 0;
-
-  va_list args;
-  va_start(args, acFmt);
 
   if (0 == acBuffer)
   {
@@ -593,7 +592,10 @@ int zheader(const unsigned char* acFmt, ...)
       esx_f_write(g_tState.dump.hFile, "\n", 1);
     }
 
+    va_start(args, acFmt);
     iReturn = vsnprintf(acBuffer, g_tState.tScreen.cols + 1, acFmt, args);
+    va_end(args);
+
     zprintf("%s\n\n", acBuffer);
   }
 
