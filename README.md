@@ -24,19 +24,19 @@ SYSINFO - System Info ZX Spectrum Next
 
 ## EXAMPLES
 
-#### .sysinfo
+    .sysinfo
 
 Show all information on the screen
 
-#### .sysinfo . -v
+    .sysinfo . -v
 
 Show all information on the screen and save all in the current directory with a default name ("./sysinfo-0.txt")
 
-#### .sysinfo /home/tmp/info.txt -t r
+    .sysinfo /home/tmp/info.txt -t r
 
-Show only registervalues on the screen and save it in with the given pathname
+Show only registervalues on the screen and save it with the given pathname
 
-#### .sysinfo /home/tmp -t rv -q
+    .sysinfo /home/tmp -t rv -q
 
 Save registervalues and systemvariables with default name in the given directory without output on screen
 
