@@ -20,7 +20,7 @@ SRCS += $(SRC_DIR)/dumpVars.c
 # Compiler-Flags
 CFLAGS  = -compiler=sdcc -clib=sdcc_iy -SO3 --opt-code-size -I$(INC_DIR) -pragma-include:$(INC_DIR)/zpragma.inc
 CFLAGS += -startup=30
-CFLAGS += --max-allocs-per-node200000
+# CFLAGS += --max-allocs-per-node200000
 # CFLAGS += --max-allocs-per-node4000
 CFLAGS += -v           # verbose output
 # CFLAGS += --list       # create list files
@@ -39,7 +39,7 @@ CC = zcc +$(TARGET) $(CFLAGS) $(SRCS) $(LDFLAGS)
 all:
 	$(CC)
   # Why fucking hell does ZCC not use the full name ?? 
-  @rm -f $(BUILD_DIR)/$(APPNAME)
+	@rm -f $(BUILD_DIR)/$(APPNAME)
 	@mv -f $(BUILD_DIR)/SYSINF $(BUILD_DIR)/$(APPNAME)
 
 # Cleanup all build files

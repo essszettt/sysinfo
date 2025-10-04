@@ -39,6 +39,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <malloc.h>
@@ -163,6 +164,10 @@ int dumpOperatingSystem(void)
     zprintf("+ " DUMP_NOSSUB " = 0x%02X\n", "FLAGS", tDevice.flags);
     zprintf("+ " DUMP_NOSSUB " = 0x%lX\n",  "SIZE",  tDevice.size);
   }
+
+  // Environment variables ...
+  zprintf(DUMP_NOSNAME " = \"%s\"\n", "ENV.PATH", getenv("path"));
+  zprintf(DUMP_NOSNAME " = \"%s\"\n", "ENV.TMP",  getenv("tmp"));
 
   return iReturn;
 }
