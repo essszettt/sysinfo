@@ -479,6 +479,26 @@ int dumpRegisters(void)
                 uiValue, uiValue32);
         break;
 
+      case 0x43: /* 67 Palette Control -------------------------------------- */
+        zprintf(" + " DUMP_REGSUB " = %s\n", "ENHULACTRL", uiValue & (1 << 0) ? "on" : "off");
+        zprintf(" + " DUMP_REGSUB " = %s\n", "ACTULAPAL",  uiValue & (1 << 1) ? "second" : "first");
+        zprintf(" + " DUMP_REGSUB " = %s\n", "ACTL2PAL",   uiValue & (1 << 2) ? "second" : "first");
+        zprintf(" + " DUMP_REGSUB " = %s\n", "ACTSPRPAL",  uiValue & (1 << 3) ? "second" : "first");
+        switch ((uiValue >> 4) & 0x07)
+        {
+          case 0x00: acValue = "Layer 0/1 first"; break;
+          case 0x01: acValue = "Layer 2 first"; break;
+          case 0x02: acValue = "Sprites first"; break;
+          case 0x03: acValue = "Layer 3 first"; break;
+          case 0x04: acValue = "Layer 0/1 second"; break;
+          case 0x05: acValue = "Layer 2 second"; break;
+          case 0x06: acValue = "Sprites second"; break;
+          default:   acValue = "Layer 3 second";
+        }
+        zprintf(" + " DUMP_REGSUB " = %s\n", "PALSELECT", acValue);
+        zprintf(" + " DUMP_REGSUB " = %s\n", "PALAUTOINC",  uiValue & (1 << 7) ? "off" : "on");
+        break;
+
       case 0x50: /* 50 MMU slot X control ----------------------------------- */
       case 0x51:
       case 0x52:

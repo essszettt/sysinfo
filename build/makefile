@@ -20,7 +20,7 @@ SRCS += $(SRC_DIR)/dumpVars.c
 # Compiler-Flags
 CFLAGS  = -compiler=sdcc -clib=sdcc_iy -SO3 --opt-code-size -I$(INC_DIR) -pragma-include:$(INC_DIR)/zpragma.inc
 CFLAGS += -startup=30
-# CFLAGS += --max-allocs-per-node200000
+CFLAGS += --max-allocs-per-node200000
 # CFLAGS += --max-allocs-per-node4000
 CFLAGS += -v           # verbose output
 # CFLAGS += --list       # create list files
