@@ -28,7 +28,7 @@ SYSINFO - System Info ZX Spectrum Next
 
 Show all information on the screen
 
-    .sysinfo . -v
+    .sysinfo . -t v
 
 Show all information on the screen and save all in the current directory with a default name ("./sysinfo-0.txt")
 
