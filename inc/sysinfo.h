@@ -43,16 +43,34 @@
 /*============================================================================*/
 /*                               Defines                                      */
 /*============================================================================*/
+/*!
+Beginning of project specific error codes.
+*/
 #define ERROR_SPECIFIC (0x0200)
-#define EBREAK   (ERROR_SPECIFIC + 0x00)
+
+/*!
+Error code: BREAK was pressed; abort execution
+*/
+#define EBREAK (ERROR_SPECIFIC + 0x00)
+
+/*!
+Error code: Timeout in operation
+*/
 #define ETIMEOUT (ERROR_SPECIFIC + 0x01)
 
 #ifndef ERANGE
+  /*!
+  (Re)definition of error "ERANGE". Maybe just a type in <errno.h> that needs to
+  be corrected ...
+  */
   #define ERANGE __ERANGE
   #warning "ERANGE not defined in errno.h (typo ?)"
 #endif
 
 #ifndef RTM_28MHZ
+  /*!
+  Missing constant for 28-Mhz-speed of ZXN (missing in <zxn.h>)
+  */
   #define RTM_28MHZ 0x03
   #warning "RTM_28MHZ not defined in zxn.h"
 #endif
@@ -66,6 +84,10 @@ and the log file.
 */
 #define LINE_LEN_MAX (0x180)
 
+/*!
+This macro can be used like "printf" but it's implementation is only compiled
+and linked in debug-builds ("#define __DEBUG__").
+*/
 #ifdef __DEBUG__
   #define DBGPRINTF(...) do { (void) printf(__VA_ARGS__); } while (0)
 #else

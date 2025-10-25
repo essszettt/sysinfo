@@ -121,7 +121,7 @@ int dumpOperatingSystem(void)
 
   // Screen mode
   struct esx_mode tMode;
-  memset(&tMode, sizeof(tMode), 0);
+  memset(&tMode, 0, sizeof(tMode));
 
   if (0 == esx_ide_mode_get(&tMode))
   {
@@ -154,7 +154,7 @@ int dumpOperatingSystem(void)
 
   // Disk info (current drive) ...
   struct esxdos_device tDevice;
-  memset(&tDevice, sizeof(tDevice), 0);
+  memset(&tDevice, 0, sizeof(tDevice));
 
   if (/* 0 == */ (uiValue16 = esxdos_disk_info(uiRawDrive, &tDevice)))
   {

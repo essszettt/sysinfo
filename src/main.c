@@ -120,7 +120,7 @@ static struct _state
   /*!
   All information about the dump file 
   */
-  struct 
+  struct _dump
   {
     /*!
     Buffer to render text output (for screen and file)
@@ -517,9 +517,13 @@ static int dumpSystemInfo(void)
 /*----------------------------------------------------------------------------*/
 int showHelp(void)
 {
+  unsigned char acAppName[0x10];
+  strncpy(acAppName, VER_INTERNALNAME_STR, sizeof(acAppName));
+  strupr(acAppName);
+
   printf("%s\n\n", VER_FILEDESCRIPTION_STR);
 
-  printf("%s file [-t rvo][-f][-q][-h][-v]\n\n", strupr(VER_INTERNALNAME_STR));
+  printf("%s file [-t rvo][-f][-q][-h][-v]\n\n", acAppName);
   //      0.........1.........2.........3.
   printf(" file        name of logfile\n");
   printf(" -t[opic]    topics to show:\n");
@@ -538,7 +542,11 @@ int showHelp(void)
 /*----------------------------------------------------------------------------*/
 int showInfo(void)
 {
-  printf("%s " VER_LEGALCOPYRIGHT_STR "\n", strupr(VER_INTERNALNAME_STR));
+  unsigned char acAppName[0x10];
+  strncpy(acAppName, VER_INTERNALNAME_STR, sizeof(acAppName));
+  strupr(acAppName);
+
+  printf("%s " VER_LEGALCOPYRIGHT_STR "\n", acAppName);
   //      0.........1.........2.........3.
   printf(" Version %s\n", VER_FILEVERSION_STR);
   printf(" Stefan Zell (info@diezells.de)\n");
