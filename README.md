@@ -1,24 +1,21 @@
-# SYSINFO
-
+       _____            ____      ____    
+      / ___/__  _______/  _/___  / __/___ 
+      \__ \/ / / / ___// // __ \/ /_/ __ \
+     ___/ / /_/ (__  )/ // / / / __/ /_/ /
+    /____/\__, /____/___/_/ /_/_/  \____/ 
+         /____/                           
+     
 Application to read system information on a ZX Soectrum Next. All information can be saved as text file.
 
 The application is implemented as a DOT-command and can be called directly from BASIC.
+
+Development is done using z88dk on Windows. The makefile should also work on Linux and macOS... I hope. 😅
 
 ---
 
 ## USAGE
 
-SYSINFO - System Info ZX Spectrum Next
-
-    .SYSINFO file [-t rvo] [-f] [-q] [-h] [-v] 
-
-    file        name of logfile
-    -t[opic]    topics to show:
-                r[eg] v[ar] o[s]
-    -f[orce]    force overwrite
-    -q[uiet]    no screen output
-    -h[elp]     print this help
-    -v[ersion]  print version info
+![help.bmp](https://github.com/essszettt/sysinfo/blob/main/doc/help.bmp)
 
 ---
 
