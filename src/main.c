@@ -92,7 +92,7 @@ static struct _state
   */
   bool bForce;
 
-  /*
+  /*!
   If this flag is set, no messages are printed to stdout/stderr
   */
   bool bQuiet;
@@ -145,28 +145,28 @@ List of all errormessages (and codes) that can be sent to NextOS at return
 */
 const errentry_t g_tErrTable[] =
 {
-  {EOK,         "no error"                      "\xA0"},
-  {EACCES,      "access denied"                 "\xA0"},
-  {EBADF,       "bad file"                      "\xA0"},
-  {EBDFD,       "bad file descriptor"           "\xA0"},
-  {EDOM,        "out of domain of function"     "\xA0"},
-  {EFBIG,       "file too large"                "\xA0"},
-  {EINVAL,      "invalid value"                 "\xA0"},
-  {EMFILE,      "too many open files"           "\xA0"},
-  {ENFILE,      "too many open files in system" "\xA0"},
-  {ENOLCK,      "no locks available"            "\xA0"},
-  {ENOMEM,      "out of mem"                    "\xA0"},
-  {ENOTSUP,     "not supported"                 "\xA0"},
-  {EOVERFLOW,   "overflow"                      "\xA0"},
-  {ERANGE,      "out of range"                  "\xA0"},
-  {ESTAT,       "bad state"                     "\xA0"},
-  {EAGAIN,      "resource temp. unavailable"    "\xA0"},
-  {EWOULDBLOCK, "operation would block"         "\xA0"},
-  /* ---------------- APPLICATION SPECIFIC ---------- */
-  {EBREAK,      "D BREAK - no repeat"           "\xA0"},
-  {ETIMEOUT,    "timeout error"                 "\xA0"},
-  /* ---------------- END-OF-LIST ------------------- */
-  {END_OF_LIST, "unknown error"                 "\xA0"}
+  {EOK,         "no erro"                   "\xF2"}, /* 'r' | 0x80 */
+  {EACCES,      "access denie"              "\xE4"}, /* 'd' | 0x80 */
+  {EBADF,       "bad fil"                   "\xE5"}, /* 'e' | 0x80 */
+  {EBDFD,       "bad file descripto"        "\xF2"}, /* 'r' | 0x80 */
+  {EDOM,        "out of domain of functio"  "\xEE"}, /* 'n' | 0x80 */
+  {EFBIG,       "file too larg"             "\xE5"}, /* 'e' | 0x80 */
+  {EINVAL,      "invalid valu"              "\xE5"}, /* 'e' | 0x80 */
+  {EMFILE,      "too many open file"        "\xE5"}, /* 'e' | 0x80 */
+  {ENFILE,      "too many open files in syste\xED"}, /* 'm' | 0x80 */
+  {ENOLCK,      "no locks availabl"         "\xE5"}, /* 'e' | 0x80 */
+  {ENOMEM,      "out of me"                 "\xED"}, /* 'm' | 0x80 */
+  {ENOTSUP,     "not supporte"              "\xE4"}, /* 'd' | 0x80 */
+  {EOVERFLOW,   "overflo"                   "\xEF"}, /* 'w' | 0x80 */
+  {ERANGE,      "out of rang"               "\xE5"}, /* 'e' | 0x80 */
+  {ESTAT,       "bad stat"                  "\xF4"}, /* 't' | 0x80 */
+  {EAGAIN,      "resource temp. unavailabl" "\xE5"}, /* 'e' | 0x80 */
+  {EWOULDBLOCK, "operation would bloc"      "\xEB"}, /* 'k' | 0x80 */
+  /* ---------------- APPLICATION SPECIFIC ----------------------- */
+  {EBREAK,      "D BREAK - no repea"        "\xF4"}, /* 't' | 0x80 */
+  {ETIMEOUT,    "timeout erro"              "\xF2"}, /* 'r' | 0x80 */
+  /* ---------------- END-OF-LIST -------------------------------- */
+  {END_OF_LIST, "unknown erro"              "\xF2"}  /* 'r' | 0x80 */
 };
 
 /*============================================================================*/
@@ -290,7 +290,7 @@ int main(int argc, char* argv[])
     }
   }
 
-  return (int) (EOK == g_tState.iExitCode ? 0 : _strerror(g_tState.iExitCode));
+  return (int) (EOK == g_tState.iExitCode ? 0 : zxn_strerror(g_tState.iExitCode));
 }
 
 
@@ -332,29 +332,44 @@ int parseArguments(int argc, char* argv[])
         if ((i + 1) < argc)
         {
           const unsigned char* acNextArg = argv[i + 1];
-          uint8_t uiLen = strlen(acNextArg);
+          const uint8_t uiArgLen = strlen(acNextArg);
           uint8_t uiFeatures = 0;
 
-          for (uint8_t j = 0; j < uiLen; ++j)
+          DBGPRINTF("parseArgs() - narg=%s; nlen=%u\n", acNextArg, uiLen);
+
+          for (uint8_t j = 0; j < uiArgLen; ++j)
           {
-            if ('r' == tolower(acNextArg[j]))
+            register const unsigned char cTopic = tolower(acNextArg[j]);
+
+            DBGPRINTF("parseArgs() - idx=%u; opt=%c:%c\n", j, acNextArg[j], cTopic);
+
+            switch (cTopic)
             {
-              uiFeatures |= FEATURE_REGISTERS;
-            }
-            else if ('v' == tolower(acNextArg[j]))
-            {
-              uiFeatures |= FEATURE_SYSVARS;
-            }
-            else if ('o' == tolower(acNextArg[j]))
-            {
-              uiFeatures |= FEATURE_NEXTOS;
+              case 'r': uiFeatures |= ((uint8_t) FEATURE_REGISTERS); break;
+              case 'o': uiFeatures |= ((uint8_t) FEATURE_NEXTOS   ); break;
+              case 'v': uiFeatures |= ((uint8_t) FEATURE_SYSVARS  ); break;
+
+              default:
+                fprintf(stderr, "unknown topic: \"%c\"\n", cTopic);
             }
           }
 
+          /*
+          REMARK: SDCC seems to remove to assignment of "uiFeatures" to
+                  "g_tState.uiFeatures" if I do it with the if-statement ?
+                  If I do it with the trigraph everything works as expected ...
+                  If I activte the DBGPRINTFs, it works also ;-) ...
+                                                              S.Zell, 10/25/2025
+          */
+         #if 1
+          g_tState.uiFeatures = (uiFeatures ? uiFeatures : g_tState.uiFeatures);
+         #else
           if (0 != uiFeatures)
           {
             g_tState.uiFeatures = uiFeatures;
           }
+         #endif
+          DBGPRINTF("parseArgs() - features = 0x%02X:0x%02X\n", uiFeatures, g_tState.uiFeatures);
 
           ++i;
         }
@@ -369,7 +384,7 @@ int parseArguments(int argc, char* argv[])
     else
     {
       snprintf(g_tState.dump.acPathName, sizeof(g_tState.dump.acPathName), "%s", acArg);
-      _normalizepath(g_tState.dump.acPathName);
+      zxn_normalizepath(g_tState.dump.acPathName);
     }
 
     ++i;
@@ -464,6 +479,8 @@ static int dumpSystemInfo(void)
 
   if (EOK == iReturn)
   {
+    DBGPRINTF("dumpSysInfo() - features = 0x%02X\n", g_tState.uiFeatures);
+
     if (g_tState.uiFeatures & FEATURE_REGISTERS)
     {
       dumpRegisters();
@@ -604,9 +621,9 @@ int zheader(const unsigned char* acFmt, ...)
 
 
 /*----------------------------------------------------------------------------*/
-/* _strerror()                                                                */
+/* zxn_strerror()                                                             */
 /*----------------------------------------------------------------------------*/
-const unsigned char* _strerror(int iCode)
+const unsigned char* zxn_strerror(int iCode)
 {
   const errentry_t* pIndex = g_tErrTable;
 
@@ -625,9 +642,9 @@ const unsigned char* _strerror(int iCode)
 
 
 /*----------------------------------------------------------------------------*/
-/* _frames()                                                                  */
+/* zxn_frames()                                                               */
 /*----------------------------------------------------------------------------*/
-uint32_t _frames(uint8_t* pFrames)
+uint32_t zxn_frames(uint8_t* pFrames)
 {
   union
   {
@@ -660,9 +677,10 @@ uint8_t _cpuspeed(void)
 
 
 /*----------------------------------------------------------------------------*/
-/* _normalizepath()                                                           */
+/* zxn_normalizepath()                                                        */
 /*----------------------------------------------------------------------------*/
-int _normalizepath(unsigned char* acPath)
+#if 0
+int zxn_normalizepath(unsigned char* acPath)
 {
   int iReturn = EOK;
 
@@ -675,9 +693,9 @@ int _normalizepath(unsigned char* acPath)
       STATE_IDLE
     } eState = STATE_CUTTING;
 
-    if (0 < (uiIdx = strlen(acPath)))
+    if (0 < (uiIdx = strlen((const char*) acPath)))
     {
-      while (0 <= uiIdx)
+      while (((size_t) 0) <= --uiIdx)
       {
         if ('\\' == acPath[uiIdx])
         {
@@ -700,8 +718,6 @@ int _normalizepath(unsigned char* acPath)
         {
           break;
         }
-
-        --uiIdx;
       }
     }
   }
@@ -712,7 +728,73 @@ int _normalizepath(unsigned char* acPath)
 
   return iReturn;
 }
+#else
+int zxn_normalizepath(unsigned char* acPath)
+{
+  /*
+  ZX Spectrum Next Pfad-Normalisierung (in-place, joinbar)
+  - '\\' => '/'
+  - doppelte '/' zu einem '/'
+  - trailing '/' entfernen (ausser bei "/" => "/.")
+  - "/" wird zu "/."   (joinbar, aber bleibt im Root)
+  - "X:/" wird zu "X:"
+  Rueckgabe: EOK oder EINVAL bei Fehler.
+  */
 
+  if (NULL == acPath)
+  {
+    return EINVAL;
+  }
+
+  /* 1) '\' => '/' und doppelte '/' entfernen */
+  size_t r = 0, w = 0;
+  while ('\0' != acPath[r])
+  {
+    char c = acPath[r++];
+
+    if ('\\' == c)
+    {
+      c = '/';
+    }
+
+    if ('/' == c)
+    {
+      if ((0 < w) && ('/' == acPath[w - 1]))
+      {
+        continue;
+      }
+    }
+
+    acPath[w++] = c;
+  }
+
+  acPath[w] = '\0';
+
+  /* 2) Spezialfaelle fuer "joinbare" Basen */
+  if ((1 == w) && ('/' == acPath[0]))
+  {
+    /* "/" => "/." */
+    acPath[1] = '.';
+    acPath[2] = '\0';
+    return EOK;
+  }
+
+  if ((3 == w) && isalpha((unsigned char) acPath[0]) && (':' == acPath[1]) && ('/' == acPath[2]))
+  {
+    /* "X:/" => "X:" */
+    acPath[2] = '\0';
+    return EOK;
+  }
+
+  /* 3) Allgemein: trailing '/' entfernen */
+  while ((0 < w) && ('/' == acPath[w - 1]))
+  {
+    acPath[--w] = '\0';
+  }
+
+  return EOK;
+}
+#endif
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */

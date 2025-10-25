@@ -102,7 +102,7 @@ static const varentry_t g_tVariables[] =
   {0x5B67, 0x01, 0x00, "BANK678"  },
   {0x5B68, 0x01, 0x00, "FLAGN"    },
   {0x5B69, 0x01, 0x00, "MAXBNK"   },
-  {0x5B6A, 0x02, 0x00, "OLDSP"    },
+  {0x5B6A, 0x02, 0x80, "OLDSP"    }, // ptr
   {0x5B6C, 0x02, 0x80, "SYNRET"   }, // ptr
   {0x5B6E, 0x05, 0x00, "LASTV"    },
   {0x5B73, 0x01, 0x00, "TILEBNKL" },
@@ -268,11 +268,11 @@ int dumpVariables(void)
         {
           if (0 != value.uiRaw16[0]) /* NULL ? */
           {
-            snprintf(g_acValue, sizeof(g_acValue), "(%04X)", value.uiRaw16[0]);
+            snprintf(g_acValue, sizeof(g_acValue), "<%04X>", value.uiRaw16[0]);
           }
           else
           {
-            snprintf(g_acValue, sizeof(g_acValue), "(%s)", "null");
+            snprintf(g_acValue, sizeof(g_acValue), "<%s>", "null");
           }
         }
         else
@@ -303,6 +303,16 @@ int dumpVariables(void)
         }
         break;
 
+      case 0x5C3B: /* FLAGS */
+        zprintf("   + " DUMP_VARSUB " = %s\n", "LEADSPACE", value.uiRaw8[0] & (1 << 0) ? sKEY_DISABLED : sKEY_ENABLED);
+        zprintf("   + " DUMP_VARSUB " = %s\n", "PRNINUSE",  value.uiRaw8[0] & (1 << 1) ? sKEY_TRUE     : sKEY_FALSE  );
+        zprintf("   + " DUMP_VARSUB " = %s\n", "PRNMODE",   value.uiRaw8[0] & (1 << 2) ? "L"           : "K"         );
+        zprintf("   + " DUMP_VARSUB " = %s\n", "KEYBMODE",  value.uiRaw8[0] & (1 << 3) ? "L"           : "K"         );
+        zprintf("   + " DUMP_VARSUB " = %s\n", "NEWKEY",    value.uiRaw8[0] & (1 << 5) ? sKEY_TRUE     : sKEY_FALSE  );
+        zprintf("   + " DUMP_VARSUB " = %s\n", "VARTYPE",   value.uiRaw8[0] & (1 << 6) ? "numeric"     : "string"    );
+        zprintf("   + " DUMP_VARSUB " = %s\n", "EXECMODE",  value.uiRaw8[0] & (1 << 7) ? "execution"   : "syn.check" );
+        break;
+
       case 0x5C41: /* MODE */
         {
           const unsigned char* acModes[] = {"C|K|L", "E", "G", ""};
@@ -315,7 +325,11 @@ int dumpVariables(void)
         break;
 
       case 0x5C6A: /* FLAGS2 */
-        zprintf("   + " DUMP_VARSUB " = %s\n", "CAPS", value.uiRaw8[0] & (1 << 3) ? "on" : "off");
+        zprintf("   + " DUMP_VARSUB " = %s\n", "SCRNCLEAR", value.uiRaw8[0] & (1 << 0) ? sKEY_TRUE : sKEY_FALSE);
+        zprintf("   + " DUMP_VARSUB " = %s\n", "PRNBFIUSE", value.uiRaw8[0] & (1 << 1) ? sKEY_TRUE : sKEY_FALSE);
+        zprintf("   + " DUMP_VARSUB " = %s\n", "QUOTES",    value.uiRaw8[0] & (1 << 2) ? sKEY_TRUE : sKEY_FALSE);
+        zprintf("   + " DUMP_VARSUB " = %s\n", "CAPS",      value.uiRaw8[0] & (1 << 3) ? sKEY_ON   : sKEY_OFF  );
+        zprintf("   + " DUMP_VARSUB " = %s\n", "CHNKINUSE", value.uiRaw8[0] & (1 << 4) ? sKEY_TRUE : sKEY_FALSE);
         break;
 
       case 0x5C8D: /* ATTR_P */

@@ -61,10 +61,25 @@
 #define ESX_DIR_SEP "/"
 
 /*!
-Maximaum length of a text buffer that is used to render a line of the screen
-output and the log file. 
+Maximum length of a text buffer that is used to render a line on screen output
+and the log file. 
 */
 #define LINE_LEN_MAX (0x180)
+
+#ifdef __DEBUG__
+  #define DBGPRINTF(...) do { (void) printf(__VA_ARGS__); } while (0)
+#else
+  #define DBGPRINTF(...) do { } while (0)
+#endif
+
+#define sKEY_ON       "on"
+#define sKEY_OFF      "off"
+#define sKEY_TRUE     "true"
+#define sKEY_FALSE    "false"
+#define sKEY_ENABLED  "enabled"
+#define sKEY_DISABLED "disabled"
+#define sKEY_FIRST    "first"
+#define sKEY_SECOND   "second"
 
 /*============================================================================*/
 /*                               Namespaces                                   */
@@ -134,7 +149,7 @@ int zheader(const unsigned char* acFmt, ...);
 This function returns a pointer to a textual error message for the given
 error code.
 */
-const unsigned char* _strerror(int iCode);
+const unsigned char* zxn_strerror(int iCode);
 
 /*!
 Internal function: The cpu speed is latched at startup of the application. The
@@ -145,14 +160,14 @@ uint8_t _cpuspeed(void);
 /*!
 Internal function: Convert the 24bit-value from sysvar "FRAMES" to 32bit.
 */
-uint32_t _frames(uint8_t * pFrames);
+uint32_t zxn_frames(uint8_t* pFrames);
 
 /*!
-In this function cleans up the given path ('\\' => '/', remove trailing '/' )
-@param acPath Path to clean up
+This function cleans up the given path ('\\' => '/', remove trailing '/' )
+@param acPath Path to be cleaned up
 @return "0" = no error
 */
-int _normalizepath(unsigned char* acPath);
+int zxn_normalizepath(unsigned char* acPath);
 
 /*============================================================================*/
 /*                               Klassen                                      */
