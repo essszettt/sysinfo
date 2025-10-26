@@ -5,11 +5,11 @@
     /____/\__, /____/___/_/ /_/_/  \____/ 
          /____/                           
      
-Application to read system information on a ZX Soectrum Next. All information can be saved as text file.
+Application to read system information on a ZX Spectrum Next. All information can be saved as text file.
 
-The application is implemented as a DOT-command and can be called directly from BASIC.
+The application is implemented as a DOT-command and can be called directly from BASIC or from the command line.
 
-Development is done using z88dk on Windows. The makefile should also work on Linux and macOS... I hope. 😅
+Development is done using z88dk on Windows. The makefile should also work on Linux and macOS ... I hope. 😅
 
 ---
 
