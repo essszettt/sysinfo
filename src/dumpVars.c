@@ -201,12 +201,12 @@ static const varentry_t g_tVariables[] =
 Diese Tabelle dient zur effizienten Umrechnung eines numerischen Wertes in eine
 hexadezimale Zifffer (ASCII).
 */
-static const unsigned char g_acHexDigits[] = "0123456789ABCDEF";
+static const char_t g_acHexDigits[] = "0123456789ABCDEF";
 
 /*!
 Buffer to render the value of system variable
 */
-static unsigned char g_acValue[VALUE_LEN_MAX];
+static char_t g_acValue[VALUE_LEN_MAX];
 
 /*============================================================================*/
 /*                               Strukturen                                   */
@@ -303,6 +303,11 @@ int dumpVariables(void)
         }
         break;
 
+      case 0x5B79: /* LODDRV */
+      case 0x5B7A: /* SAVDRV */
+        zprintf("   + " DUMP_VARSUB " = %c\n", "DRIVE", value.uiRaw8[0]);
+        break;
+
       case 0x5C3B: /* FLAGS */
         zprintf("   + " DUMP_VARSUB " = %s\n", "LEADSPACE", value.uiRaw8[0] & (1 << 0) ? sKEY_DISABLED : sKEY_ENABLED);
         zprintf("   + " DUMP_VARSUB " = %s\n", "PRNINUSE",  value.uiRaw8[0] & (1 << 1) ? sKEY_TRUE     : sKEY_FALSE  );
@@ -315,7 +320,7 @@ int dumpVariables(void)
 
       case 0x5C41: /* MODE */
         {
-          const unsigned char* acModes[] = {"C|K|L", "E", "G", ""};
+          const char_t* acModes[] = {"C|K|L", "E", "G", ""};
           zprintf("   + " DUMP_VARSUB " = %s\n", "CURSOR", acModes[value.uiRaw8[0] & 0x03]);
         }
         break;
@@ -361,7 +366,7 @@ int dumpVariables(void)
 /*----------------------------------------------------------------------------*/
 /* nibble2hex()                                                               */
 /*----------------------------------------------------------------------------*/
-char nibble2hex(unsigned char uiValue)
+char_t nibble2hex(uint8_t uiValue)
 {
   return g_acHexDigits[uiValue & 0x0F];
 }
@@ -372,7 +377,7 @@ char nibble2hex(unsigned char uiValue)
 /*----------------------------------------------------------------------------*/
 unsigned long mem2hex(const void* const pData,
                       unsigned long uiSize,
-                      char* acBuffer,
+                      char_t* acBuffer,
                       unsigned long uiBufferSize,
                       unsigned long uiGrouping)
 {
@@ -384,10 +389,10 @@ unsigned long mem2hex(const void* const pData,
 
     if ((0 != pData) && (0 != uiSize))
     {
-      char* pSrc     = (char*) pData;
-      char* pSrcEnd  = pSrc + uiSize;
-      char* pDest    = (char*) acBuffer;
-      char* pDestEnd = pDest + uiBufferSize - 1;
+      char_t* pSrc     = (char_t*) pData;
+      char_t* pSrcEnd  = pSrc + uiSize;
+      char_t* pDest    = (char_t*) acBuffer;
+      char_t* pDestEnd = pDest + uiBufferSize - 1;
 
       while (pSrc < pSrcEnd)
       {
@@ -405,7 +410,7 @@ unsigned long mem2hex(const void* const pData,
 
         if (0 != uiGrouping)
         {
-          if (0 == ((unsigned long)(pSrc - ((char*) pData) + 1) % uiGrouping))
+          if (0 == ((unsigned long)(pSrc - ((char_t*) pData) + 1) % uiGrouping))
           {
             if ((pDest < pDestEnd) && ((pSrc + 1) < pSrcEnd))
             {

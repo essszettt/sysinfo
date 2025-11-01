@@ -18,6 +18,7 @@
 
 // create heap of given site
 #pragma output CLIB_MALLOC_HEAP_SIZE = 128
+//#pragma output CLIB_MALLOC_HEAP_SIZE = 384
 
 // non-zero closes open FILEs on exit
 #pragma output CRT_ENABLE_CLOSE = 1

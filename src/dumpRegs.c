@@ -327,7 +327,7 @@ static int dumpRegister_00_3F(uint8_t uiRegNum, uint8_t uiValue)
 
   uint16_t uiValue16;
   uint32_t uiValue32;
-  const unsigned char* acValue = 0;
+  const char_t* acValue = 0;
 
   switch (uiRegNum)
   {
@@ -636,7 +636,7 @@ static int dumpRegister_40_7F(uint8_t uiRegNum, uint8_t uiValue)
 
   uint16_t uiValue16;
   uint32_t uiValue32;
-  const unsigned char* acValue = 0;
+  const char_t* acValue = 0;
 
   switch (uiRegNum)
   {
@@ -840,7 +840,7 @@ static int dumpRegister_C0_FF(uint8_t uiRegNum, uint8_t uiValue)
 {
   int iReturn = EOK;
 
-  const unsigned char* acValue = 0;
+  const char_t* acValue = 0;
 
   switch (uiRegNum)
   {
@@ -892,7 +892,7 @@ static int dumpRegister_C0_FF(uint8_t uiRegNum, uint8_t uiValue)
 
     case 0xC5: /* 197 Interrupt Enable 1 -------------------------------- */
       {
-        unsigned char acKey[12];
+        char_t acKey[12];
         for (uint8_t i = 0; i < 8; ++i)
         {
           snprintf(acKey, sizeof(acKey), "CTCCHN%uZCTO", i);
@@ -917,7 +917,7 @@ static int dumpRegister_C0_FF(uint8_t uiRegNum, uint8_t uiValue)
 
     case 0xC9: /* 201 Interrupt Status 1 -------------------------------- */
       {
-        unsigned char acKey[12];
+        char_t acKey[12];
         for (uint8_t i = 0; i < 8; ++i)
         {
           snprintf(acKey, sizeof(acKey), "CTCCHN%uZCTO", i);
@@ -943,7 +943,7 @@ static int dumpRegister_C0_FF(uint8_t uiRegNum, uint8_t uiValue)
 
     case 0xCD: /* 205 DMA Interrupt Enable 1 ---------------------------- */
       {
-        unsigned char acKey[12];
+        char_t acKey[12];
         for (uint8_t i = 0; i < 8; ++i)
         {
           snprintf(acKey, sizeof(acKey), "CTCCHN%uZCTO", i);

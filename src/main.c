@@ -49,11 +49,11 @@
 #include <arch/zxn.h>
 #include <arch/zxn/esxdos.h>
 
+#include "sysinfo.h"
 #include "dumpDos.h"
 #include "dumpRegs.h"
 #include "dumpVars.h"
 #include "version.h"
-#include "sysinfo.h"
 
 /*============================================================================*/
 /*                               Defines                                      */
@@ -125,12 +125,12 @@ static struct _state
     /*!
     Buffer to render text output (for screen and file)
     */
-    unsigned char acBuffer[LINE_LEN_MAX];
+    char_t acBuffer[LINE_LEN_MAX];
 
     /*!
     PathName of the dump file.
     */
-    unsigned char acPathName[ESX_PATHNAME_MAX];
+    char_t acPathName[ESX_PATHNAME_MAX];
 
     /*!
     Handle of the file that's used to save the output
@@ -197,7 +197,7 @@ void _destruct(void);
 Diese Funktion interpretiert alle Argumente, die der Anwendung uebergeben
 wurden.
 */
-int parseArguments(int argc, char* argv[]);
+int parseArguments(int argc, char_t* argv[]);
 
 /*!
 Ausgabe der Hilfe dieser Anwendung.
@@ -297,7 +297,7 @@ int main(int argc, char* argv[])
 /*----------------------------------------------------------------------------*/
 /* parseArguments()                                                           */
 /*----------------------------------------------------------------------------*/
-int parseArguments(int argc, char* argv[])
+int parseArguments(int argc, char_t* argv[])
 {
   int iReturn = EOK;
 
@@ -307,7 +307,7 @@ int parseArguments(int argc, char* argv[])
 
   while (i < argc)
   {
-    const char* acArg = argv[i];
+    const char_t* acArg = argv[i];
 
     if ('-' == acArg[0])
     {
@@ -331,15 +331,15 @@ int parseArguments(int argc, char* argv[])
       {
         if ((i + 1) < argc)
         {
-          const unsigned char* acNextArg = argv[i + 1];
+          const char_t* acNextArg = argv[i + 1];
           const uint8_t uiArgLen = strlen(acNextArg);
           uint8_t uiFeatures = 0;
 
-          DBGPRINTF("parseArgs() - narg=%s; nlen=%u\n", acNextArg, uiLen);
+          DBGPRINTF("parseArgs() - narg=%s; nlen=%u\n", acNextArg, uiArgLen);
 
           for (uint8_t j = 0; j < uiArgLen; ++j)
           {
-            register const unsigned char cTopic = tolower(acNextArg[j]);
+            register const char_t cTopic = tolower(acNextArg[j]);
 
             DBGPRINTF("parseArgs() - idx=%u; opt=%c:%c\n", j, acNextArg[j], cTopic);
 
@@ -414,7 +414,7 @@ static int dumpSystemInfo(void)
       if (INV_FILE_HND != (g_tState.dump.hFile = esx_f_opendir(g_tState.dump.acPathName)))
       {
         uint16_t uiIdx = 0;
-        char acPathName[ESX_PATHNAME_MAX];
+        char_t acPathName[ESX_PATHNAME_MAX];
 
         esx_f_closedir(g_tState.dump.hFile);
         g_tState.dump.hFile = INV_FILE_HND;
@@ -517,7 +517,7 @@ static int dumpSystemInfo(void)
 /*----------------------------------------------------------------------------*/
 int showHelp(void)
 {
-  unsigned char acAppName[0x10];
+  char_t acAppName[0x10];
   strncpy(acAppName, VER_INTERNALNAME_STR, sizeof(acAppName));
   strupr(acAppName);
 
@@ -542,7 +542,7 @@ int showHelp(void)
 /*----------------------------------------------------------------------------*/
 int showInfo(void)
 {
-  unsigned char acAppName[0x10];
+  char_t acAppName[0x10];
   strncpy(acAppName, VER_INTERNALNAME_STR, sizeof(acAppName));
   strupr(acAppName);
 
@@ -558,7 +558,7 @@ int showInfo(void)
 /*----------------------------------------------------------------------------*/
 /* zprintf()                                                                  */
 /*----------------------------------------------------------------------------*/
-int zprintf(const unsigned char* acFmt, ...)
+int zprintf(const char_t* acFmt, ...)
 {
   int iReturn = 0;
   size_t uiLen;
@@ -590,12 +590,12 @@ int zprintf(const unsigned char* acFmt, ...)
 /*----------------------------------------------------------------------------*/
 /* _strerror()                                                                */
 /*----------------------------------------------------------------------------*/
-int zheader(const unsigned char* acFmt, ...)
+int zheader(const char_t* acFmt, ...)
 {
   int iReturn = 0;
   va_list args;
 
-  static unsigned char* acBuffer = 0;
+  static char_t* acBuffer = 0;
 
   if (0 == acBuffer)
   {
@@ -631,7 +631,7 @@ int zheader(const unsigned char* acFmt, ...)
 /*----------------------------------------------------------------------------*/
 /* zxn_strerror()                                                             */
 /*----------------------------------------------------------------------------*/
-const unsigned char* zxn_strerror(int iCode)
+const char_t* zxn_strerror(int iCode)
 {
   const errentry_t* pIndex = g_tErrTable;
 
@@ -687,57 +687,7 @@ uint8_t _cpuspeed(void)
 /*----------------------------------------------------------------------------*/
 /* zxn_normalizepath()                                                        */
 /*----------------------------------------------------------------------------*/
-#if 0
-int zxn_normalizepath(unsigned char* acPath)
-{
-  int iReturn = EOK;
-
-  if (0 != acPath)
-  {
-    size_t uiIdx;
-    enum
-    {
-      STATE_CUTTING = 0,
-      STATE_IDLE
-    } eState = STATE_CUTTING;
-
-    if (0 < (uiIdx = strlen((const char*) acPath)))
-    {
-      while (((size_t) 0) <= --uiIdx)
-      {
-        if ('\\' == acPath[uiIdx])
-        {
-          acPath[uiIdx] = '/';
-        }
-
-        if (STATE_CUTTING == eState)
-        {
-          if ('/' == acPath[uiIdx])
-          {
-            acPath[uiIdx] = '\0';
-          }
-          else
-          {
-            eState = STATE_IDLE;
-          }
-        }
-
-        if (0 == uiIdx)
-        {
-          break;
-        }
-      }
-    }
-  }
-  else
-  {
-    iReturn = EINVAL;
-  }
-
-  return iReturn;
-}
-#else
-int zxn_normalizepath(unsigned char* acPath)
+int zxn_normalizepath(char_t* acPath)
 {
   /*
   ZX Spectrum Next Pfad-Normalisierung (in-place, joinbar)
@@ -758,7 +708,7 @@ int zxn_normalizepath(unsigned char* acPath)
   size_t r = 0, w = 0;
   while ('\0' != acPath[r])
   {
-    char c = acPath[r++];
+    char_t c = acPath[r++];
 
     if ('\\' == c)
     {
@@ -787,7 +737,7 @@ int zxn_normalizepath(unsigned char* acPath)
     return EOK;
   }
 
-  if ((3 == w) && isalpha((unsigned char) acPath[0]) && (':' == acPath[1]) && ('/' == acPath[2]))
+  if ((3 == w) && isalpha((char_t) acPath[0]) && (':' == acPath[1]) && ('/' == acPath[2]))
   {
     /* "X:/" => "X:" */
     acPath[2] = '\0';
@@ -802,7 +752,7 @@ int zxn_normalizepath(unsigned char* acPath)
 
   return EOK;
 }
-#endif
+
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */

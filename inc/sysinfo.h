@@ -123,6 +123,12 @@ and linked in debug-builds ("#define __DEBUG__").
 /*                               Typ-Definitionen                             */
 /*============================================================================*/
 /*!
+Alias for `unsigned char`.
+Created for those too lazy to type “unsigned char” every time.
+ */
+typedef unsigned char char_t;
+
+/*!
 Enumeration to describe all valid tasks of the application
 */
 typedef enum _action
@@ -140,7 +146,7 @@ messages that can be handovered back to BASIC.
 typedef struct _errentry
 {
   int iCode;
-  const unsigned char* acText;
+  const char_t* acText;
 } errentry_t;
 
 /*!
@@ -160,18 +166,18 @@ typedef enum _features
 Replacement for "printf". This funkction prints on the screen and dumps to
 a file.
 */
-int zprintf(const unsigned char* acFmt, ...);
+int zprintf(const char_t* acFmt, ...);
 
 /*!
 Print a title line on the screen and the log file
 */
-int zheader(const unsigned char* acFmt, ...);
+int zheader(const char_t* acFmt, ...);
 
 /*!
 This function returns a pointer to a textual error message for the given
 error code.
 */
-const unsigned char* zxn_strerror(int iCode);
+const char_t* zxn_strerror(int iCode);
 
 /*!
 Internal function: The cpu speed is latched at startup of the application. The
@@ -189,7 +195,7 @@ This function cleans up the given path ('\\' => '/', remove trailing '/' )
 @param acPath Path to be cleaned up
 @return "0" = no error
 */
-int zxn_normalizepath(unsigned char* acPath);
+int zxn_normalizepath(char_t* acPath);
 
 /*============================================================================*/
 /*                               Klassen                                      */

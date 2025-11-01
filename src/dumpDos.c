@@ -45,6 +45,7 @@
 #include <malloc.h>
 #include <arch/zxn.h>
 #include <arch/zxn/esxdos.h>
+#include <arch/zxn/sysvar.h>
 
 #include "sysinfo.h"
 #include "dumpDos.h"
@@ -91,10 +92,8 @@
 int dumpOperatingSystem(void)
 {
   int iReturn = EOK;
+  uint16_t uiOsVersion = 0xFFFF; 
 
-  uint8_t  uiValue8;
-  uint16_t uiValue16;
- 
   zheader("ESXDOS/NEXTOS");
 
   // DOS-Version (ESXDOS) ...
@@ -102,72 +101,260 @@ int dumpOperatingSystem(void)
   ACHTUNG:  Liefert seit Umstellung DOT->DOTN keine brauchbare Info mehr ?
                                                                   SZ, 14.09.2025
   */
-  uiValue16 = esx_m_dosversion();
-  zprintf(DUMP_NOSNAME " = %u.%02u\n", "DOSVERSION", ESX_DOSVERSION_NEXTOS_MAJOR(uiValue16),
-                                                     ESX_DOSVERSION_NEXTOS_MINOR(uiValue16));
-  zprintf("+ " DUMP_NOSSUB " = %s\n", "MODE", (0x0000 == uiValue16 ? "48K" : "128K/NEXT"));
+  if (EOK == iReturn)
+  {
+    uiOsVersion = esx_m_dosversion();
+    zprintf(DUMP_NOSNAME " = %u.%02u\n", "DOSVERSION",
+            ESX_DOSVERSION_NEXTOS_MAJOR(uiOsVersion),
+            ESX_DOSVERSION_NEXTOS_MINOR(uiOsVersion));
+
+    zprintf("+ " DUMP_NOSSUB " = %s\n", "MODE",
+            (ESX_DOSVERSION_NEXTOS_48K == uiOsVersion ? "48K" : "128K/NEXT"));
+  }
 
   // Date & Time
-  struct dos_tm tRaw;
-  if (0 == esx_m_getdate(&tRaw))
+  if (EOK == iReturn)
   {
-    struct tm tNow;
-    tm_from_dostm(&tNow, &tRaw);
-    zprintf(DUMP_NOSNAME " = %02u/%02u/%04u %02u:%02u:%02u%s\n", "DATETIME",
-            1 + tNow.tm_mon, tNow.tm_mday, 1900 + tNow.tm_year,
-            tNow.tm_hour, tNow.tm_min, tNow.tm_sec,
-            tNow.tm_isdst ? " DST" : "");
-  }
+    struct dos_tm tRaw;
 
-  // Screen mode
-  struct esx_mode tMode;
-  memset(&tMode, 0, sizeof(tMode));
-
-  if (0 == esx_ide_mode_get(&tMode))
-  {
-    zprintf(DUMP_NOSNAME " = %u:%u\n", "SCREENMODE", tMode.mode8.layer, tMode.mode8.submode);
-    zprintf("+ " DUMP_NOSSUB " = %u:%u\n", "COLOR", tMode.ink,   tMode.paper);
-    zprintf("+ " DUMP_NOSSUB " = %u:%u\n", "FLAGS", tMode.flags, tMode.width);
-    zprintf("+ " DUMP_NOSSUB " = %u:%u\n", "SIZE",  tMode.cols,  tMode.rows);
-  }
-
-  // Current working directory ...
-  unsigned char* acPathName = 0;
-  if (0 != (acPathName = (unsigned char*) malloc(ESX_PATHNAME_MAX)))
-  {
-    if (0 == esx_f_getcwd(acPathName))
+    if (0 == esx_m_getdate(&tRaw))
     {
-      zprintf(DUMP_NOSNAME " = %s\n", "CURRWORKDIR", acPathName);
+      struct tm tNow;
+      tm_from_dostm(&tNow, &tRaw);
+      zprintf(DUMP_NOSNAME " = %02u/%02u/%04u %02u:%02u:%02u%s\n", "DATETIME",
+              1 + tNow.tm_mon, tNow.tm_mday, 1900 + tNow.tm_year,
+              tNow.tm_hour, tNow.tm_min, tNow.tm_sec,
+              tNow.tm_isdst ? " DST" : "");
+    }
+  }
+
+  // Free memory
+  if (EOK == iReturn)
+  {
+    zprintf(DUMP_NOSNAME " = %lu\n", "MEMFREE", esx_f_getfree());
+  }
+  
+  // Screen mode
+  if (EOK == iReturn)
+  {
+    struct esx_mode tMode;
+    memset(&tMode, 0, sizeof(tMode));
+
+    if (0 == esx_ide_mode_get(&tMode))
+    {
+      zprintf(DUMP_NOSNAME " = %u:%u\n", "SCREENMODE", tMode.mode8.layer, tMode.mode8.submode);
+      zprintf("+ " DUMP_NOSSUB " = %u\n",     "INK|ATTR", tMode.ink);
+      zprintf("+ " DUMP_NOSSUB " = %u\n",     "PAPER",    tMode.paper);
+      zprintf("+ " DUMP_NOSSUB " = 0x%02X\n", "FLAGS",    tMode.flags);
+      zprintf("+ " DUMP_NOSSUB " = %u\n",     "WIDTH",    tMode.width);
+      zprintf("+ " DUMP_NOSSUB " = %u\n",     "COLS",     tMode.cols);
+      zprintf("+ " DUMP_NOSSUB " = %u\n",     "ROWS",     tMode.rows);
+    }
+  }
+
+  // Current working directory
+  if (EOK == iReturn)
+  {
+    char_t* acPathName = 0;
+    if (0 != (acPathName = (char_t*) malloc(ESX_PATHNAME_MAX)))
+    {
+      memset(acPathName, 0, ESX_PATHNAME_MAX);
+
+      if (0 == esx_f_getcwd(acPathName))
+      {
+        zprintf(DUMP_NOSNAME " = %s\n", "CURRENTWORKDIR", acPathName);
+      }
+
+      free(acPathName);
+      acPathName = 0;
+    }
+  }
+
+  // Current drive
+  if (EOK == iReturn)
+  {
+    uint8_t uiDrive = esx_m_getdrv();
+    char_t  cLetter = 'A' + (uiDrive >> 3);
+
+    zprintf(DUMP_NOSNAME " = 0x%02X\n", "DEFAULTDRIVE", uiDrive);
+    zprintf("+ " DUMP_NOSSUB " = %c\n", "LETTER", cLetter);
+    zprintf("+ " DUMP_NOSSUB " = %u\n", "INDEX", uiDrive & 0x07);
+  }
+
+  // Disk info (current drive)
+#if 0
+  if (EOK == iReturn)
+  {
+    uint8_t uiDrive;
+    int iResult;
+    struct esxdos_device tDevice;
+    memset(&tDevice, 0, sizeof(tDevice));
+
+    uiDrive = esx_m_getdrv();
+
+    /*
+    esxdos_disk_info returns "-1" ?
+    */
+
+    if (0 == (iResult = esxdos_disk_info('A' + (uiDrive >> 3), &tDevice)))
+    {
+      zprintf("+ " DUMP_NOSSUB " = 0x%02X\n", "PATH",  tDevice.path);
+      zprintf("+ " DUMP_NOSSUB " = 0x%02X\n", "FLAGS", tDevice.flags);
+      zprintf("+ " DUMP_NOSSUB " = 0x%lX\n",  "SIZE",  tDevice.size);
+    }
+    else
+    {
+      fprintf(stderr, "dumpOs() - esxdos_disk_info(0x%02X): %d\n", uiDrive, iResult);
+    }
+  }
+#endif
+
+  // Available drives
+  if (EOK == iReturn)
+  {
+    uint8_t uiResult;
+    uint8_t uiDrive;
+    uint8_t uiIdx = 0;
+    char_t  acDrives[20];
+
+    acDrives[0] = '\0';
+
+    if (ESX_DOSVERSION_NEXTOS_48K == uiOsVersion) /* NEXTZXOS == 48K Mode */
+    {
+      uint8_t uiEsxDrv;
+
+      uiDrive = esx_m_getdrv();
+      for (char_t cDrive = 'A'; cDrive <= 'P'; ++cDrive)
+      {
+        uiEsxDrv = ((cDrive - 'A') << 3) | 0x01;
+
+        /*
+        'C'  => 16
+        'M'  => 96
+        Rest => 255
+        */
+        if (0xFF != (uiResult = esx_m_setdrv(uiEsxDrv)))
+        {
+          acDrives[uiIdx] = cDrive;
+          ++uiIdx;
+          acDrives[uiIdx] = '\0';
+        }
+       #if defined(__DEBUG__)
+        else
+        {
+          fprintf(stderr, "dumpOs() - esx_m_setdrv(%c|0x%X) = %u\n", cDrive, uiEsxDrv, uiResult);
+        }
+       #endif
+      }
+      esx_m_setdrv(uiDrive);
+    }
+    else /* NEXTZXOS != 48K Mode */
+    {
+      uiDrive = esx_dos_get_drive();
+      for (char_t cDrive = 'A'; cDrive <= 'P'; ++cDrive)
+      {
+        if (0 == (uiResult = esx_dos_set_drive(cDrive)))
+        {
+          acDrives[uiIdx] = cDrive;
+          ++uiIdx;
+          acDrives[uiIdx] = '\0';
+        }
+       #if defined(__DEBUG__)
+        else
+        {
+          fprintf(stderr, "dumpOs() - esx_dos_set_drive(%c) = %u\n", cDrive, uiResult);
+        }
+       #endif
+      }
+      esx_dos_set_drive(uiDrive);
+      SYSVAR_LODDRV = uiDrive;
+      SYSVAR_SAVDRV = uiDrive;
     }
 
-    free(acPathName);
-    acPathName = 0;
+    zprintf(DUMP_NOSNAME " = %s\n", "AVAIL.DRIVES", acDrives);
   }
 
-  // Current drive ...
-  uint8_t uiRawDrive;
-  uiValue8 = esx_m_getdrv();
-  uiRawDrive = 0x41 + ((uiValue8 >> 3) & 0x1F);
-  zprintf(DUMP_NOSNAME " = 0x%02X\n", "DEFAULTDRIVE", uiValue8);
-  zprintf("+ " DUMP_NOSSUB " = %c\n", "LETTER", uiRawDrive);
-  zprintf("+ " DUMP_NOSSUB " = %u\n", "INDEX", uiValue8 & 0x07);
+#if 0
+  /* !!! CRASHING !!! */
 
-  // Disk info (current drive) ...
-  struct esxdos_device tDevice;
-  memset(&tDevice, 0, sizeof(tDevice));
-
-  if (/* 0 == */ (uiValue16 = esxdos_disk_info(uiRawDrive, &tDevice)))
+  if (EOK == iReturn)
   {
-    // printf("\x10\x02"); // INK 2
-    zprintf("+ " DUMP_NOSSUB " = 0x%X\n",  "RESULT", uiValue16); /* TODO */
-    zprintf("+ " DUMP_NOSSUB " = 0x%02X\n", "PATH",  tDevice.path);
-    zprintf("+ " DUMP_NOSSUB " = 0x%02X\n", "FLAGS", tDevice.flags);
-    zprintf("+ " DUMP_NOSSUB " = 0x%lX\n",  "SIZE",  tDevice.size);
-  }
+    uint8_t uiIdx = 0;
+    char_t  acDrive[4]; /* "C:/" */
+    char_t  acDrives[20];
+    uint8_t hDir = INV_FILE_HND;
 
-  // Environment variables ...
-  zprintf(DUMP_NOSNAME " = \"%s\"\n", "ENV.PATH", getenv("path"));
-  zprintf(DUMP_NOSNAME " = \"%s\"\n", "ENV.TMP",  getenv("tmp"));
+    acDrives[0] = '\0';
+    strcpy(acDrive, "?:/");
+
+    for (char_t cDrive = 'A'; cDrive <= 'C'; ++cDrive)
+    {
+      acDrive[0] = cDrive;
+
+      DBGPRINTF("dumpDos() - drive = %s\n", acDrive);
+
+      if (INV_FILE_HND != (hDir = esx_f_opendir(acDrive)))
+      {
+        acDrives[uiIdx] = cDrive;
+        ++uiIdx;
+        acDrives[uiIdx] = '\0';
+
+        DBGPRINTF("dumpDos() - hDir = %u\n", hDir);
+
+        (void) esx_f_closedir(hDir);
+      }
+      else
+      {
+        fprintf(stderr, "dumpDos() - esx_f_opendir(%s) = %d\n", acDrive, hDir);
+      }
+
+      DBGPRINTF("dumpDos() - drives = %s\n", acDrives);
+    }
+
+    zprintf(DUMP_NOSNAME " = %s\n", "DRIVES", acDrives);
+  }
+#endif
+
+#if 0
+  /* !!! CRASHING !!! */
+
+  if (EOK == iReturn)
+  {
+    uint8_t uiIdx = 0;
+    uint8_t uiDrive;
+    char_t  acDrives[20];
+    char_t  acPathName = 0;
+
+    if (0 != (acPathName = (char_t*) malloc(ESX_PATHNAME_MAX)))
+    {
+      acDrives[0] = '\0';
+
+      uiDrive = esx_m_getdrv();
+      for (char_t cDrive = 'A'; cDrive <= 'P'; ++cDrive)
+      {
+        if (0 == esx_f_getcwd_drive(cDrive, acPathName))
+        {
+          acDrives[uiIdx] = cDrive;
+          ++uiIdx;
+          acDrives[uiIdx] = '\0';
+        }
+      }
+      esx_m_setdrv(uiDrive);
+
+      zprintf(DUMP_NOSNAME " = %s\n", "DRIVES", acDrives);
+
+      free(acPathName);
+      acPathName = 0;
+    }
+  }
+#endif
+
+  // Environment variables
+  if (EOK == iReturn)
+  {
+    zprintf(DUMP_NOSNAME " = \"%s\"\n", "ENV.PATH", getenv("path"));
+    zprintf(DUMP_NOSNAME " = \"%s\"\n", "ENV.TMP",  getenv("tmp"));
+  }
 
   return iReturn;
 }

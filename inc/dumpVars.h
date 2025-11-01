@@ -92,7 +92,7 @@ typedef struct _varentry
   /*!
   Name of variable
   */
-  const unsigned char* acName;
+  const char_t* acName;
 } varentry_t;
 
 /*============================================================================*/
@@ -109,7 +109,7 @@ transformiert werden.
 @param uiValue Zu transformierender Wert (nur das Low-Nibble wird verwendet)
 @return Transformierte Hexadezimalziffer
 */
-char nibble2hex(unsigned char uiValue);
+char_t nibble2hex(uint8_t uiValue);
 
 /*!
 Mit dieser Funktion kann eine Hex-Darstellung (als String) eines beliebigen
@@ -153,7 +153,7 @@ Ausgabe:
 */
 unsigned long mem2hex(const void* const pData,
                       unsigned long uiSize,
-                      char* acBuffer,
+                      char_t* acBuffer,
                       unsigned long uiBufferSize,
                       unsigned long uiGrouping);
 
