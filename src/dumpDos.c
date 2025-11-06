@@ -93,6 +93,7 @@ int dumpOperatingSystem(void)
 {
   int iReturn = EOK;
   uint16_t uiOsVersion = 0xFFFF; 
+  const char_t* acValue = 0;
 
   zheader("ESXDOS/NEXTOS");
 
@@ -103,13 +104,17 @@ int dumpOperatingSystem(void)
   */
   if (EOK == iReturn)
   {
-    uiOsVersion = esx_m_dosversion();
+    switch (uiOsVersion = esx_m_dosversion())
+    {
+      case ESX_DOSVERSION_ESXDOS:     acValue = "esxDOS"; break;
+      case ESX_DOSVERSION_NEXTOS_48K: acValue = "48K";    break;
+      default:                        acValue = "128K/NEXT";
+    }
+
     zprintf(DUMP_NOSNAME " = %u.%02u\n", "DOSVERSION",
             ESX_DOSVERSION_NEXTOS_MAJOR(uiOsVersion),
             ESX_DOSVERSION_NEXTOS_MINOR(uiOsVersion));
-
-    zprintf("+ " DUMP_NOSSUB " = %s\n", "MODE",
-            (ESX_DOSVERSION_NEXTOS_48K == uiOsVersion ? "48K" : "128K/NEXT"));
+    zprintf("+ " DUMP_NOSSUB " = %s\n", "MODE", acValue);
   }
 
   // Date & Time
