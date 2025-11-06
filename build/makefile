@@ -1,67 +1,90 @@
-.PHONY: clean all
+.PHONY: all clean
 
-# Target Platform ä###########
-TARGET = zxn
+### Target Platform ####################
+TARGET := zxn
 
-# Project Name ###############
-APPNAME = sysinfo
+### Project Name #######################
+APPNAME := sysinfo
 
-# Directories ################
+### Binary type ########################
+APPTYPE := dotn
+
+### OS specific settings ###############
+ifeq ($(OS),Windows_NT)
+RM := rm -f
+MV := mv -f
+else
+RM := rm -f
+MV := mv -f
+endif
+
+### Build Type #########################
+BUILD ?= release
+
+### Directories ########################
 SRC_DIR = ../src
 INC_DIR = ../inc
 BUILD_DIR = .
 
-# Source Files ###############
+### Source Files #######################
 SRCS  = $(SRC_DIR)/main.c
 SRCS += $(SRC_DIR)/dumpDos.c
 SRCS += $(SRC_DIR)/dumpRegs.c
 SRCS += $(SRC_DIR)/dumpVars.c
 
-# Compiler Options ###########
+### Compiler Options ###################
 CFLAGS = -compiler=sdcc --vc -clib=sdcc_iy -SO3 --opt-code-size -I$(INC_DIR) -pragma-include:$(INC_DIR)/zpragma.inc
 
 # Selecting CRT
 CFLAGS += -startup=30
 
-# speed vs. code quality
-# CFLAGS += --max-allocs-per-node200000
-
 # verbose output
 # CFLAGS += -v
 
+ifeq ($(BUILD), debug)
 # create list files
-# CFLAGS += --list
+CFLAGS += --list
 
 # add C code to list files
-# CFLAGS += --c-code-in-asm
+CFLAGS += --c-code-in-asm
 
 # create debug code
-# CFLAGS += -D__DEBUG__
+CFLAGS += -D__DEBUG__
+else ifeq ($(BUILD), release)
+# speed vs. code quality
+CFLAGS += --max-allocs-per-node10000
+endif
 
-# Linker Options #############
+### Linker Options #####################
 LDFLAGS = -subtype=dotn -Cz"--clean" -o$(BUILD_DIR)/$(APPNAME) -create-app
 
+ifeq ($(BUILD), debug)
 # create map file
-# LDFLAGS += -m
+LDFLAGS += -m
 
 # create symbol files
-# LDFLAGS += -s
+LDFLAGS += -s
+endif
 
-# Compiler Command ###########
+### Compiler Command ###################
 CC = zcc +$(TARGET) $(CFLAGS) $(SRCS) $(LDFLAGS)
 
-# Create build target ########
+### Create build target ################
 all:
 	$(CC)
   # Why fucking hell does ZCC not use the full name ?? 
-	@rm -f $(BUILD_DIR)/$(APPNAME)
-	@mv -f $(BUILD_DIR)/SYSINF $(BUILD_DIR)/$(APPNAME)
+ifeq ($(APPTYPE), dotn)
+ifeq ($(OS),Windows_NT)
+	@$(RM) $(BUILD_DIR)/$(APPNAME)
+	@$(MV) $(BUILD_DIR)/SYSINF $(BUILD_DIR)/$(APPNAME)
+endif
+endif
 
-# Cleanup build files ########
+### Cleanup build files ################
 clean:
-	@rm -f $(BUILD_DIR)/$(APPNAME)
-	@rm -f $(BUILD_DIR)/$(APPNAME).lis
-	@rm -f $(BUILD_DIR)/$(APPNAME).map
-	@rm -f $(BUILD_DIR)/$(APPNAME).sym
-	@rm -f $(SRC_DIR)/*.lis
-	@rm -f $(SRC_DIR)/*.sym
+	@$(RM) $(BUILD_DIR)/$(APPNAME)
+	@$(RM) $(wildcard $(BUILD_DIR)/*.lis)
+	@$(RM) $(wildcard $(BUILD_DIR)/*.map)
+	@$(RM) $(wildcard $(BUILD_DIR)/*.sym)
+	@$(RM) $(wildcard $(SRC_DIR)/*.lis)
+	@$(RM) $(wildcard $(SRC_DIR)/*.sym)
