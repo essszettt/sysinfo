@@ -577,16 +577,42 @@ static int dumpRegister_00_3F(uint8_t uiRegNum, uint8_t uiValue)
     case 0x19:
     case 0x1A:
     case 0x1B:
-    case 0x1C:
+      intrinsic_nop();
+      break;
+
+    case 0x1C: /* 28 Clip Windows Control ----------------------------------- */
+      zprintf(" + " DUMP_REGSUB " = %u\n", "LAY2CLPIDX",  (uiValue >> 0) & 0x03);
+      zprintf(" + " DUMP_REGSUB " = %u\n", "SPRCLPIDX",   (uiValue >> 2) & 0x03);
+      zprintf(" + " DUMP_REGSUB " = %u\n", "ULATXCLPIDX", (uiValue >> 4) & 0x03);
+      zprintf(" + " DUMP_REGSUB " = %u\n", "TILECLPIDX",  (uiValue >> 6) & 0x03);
+      break;
+
     case 0x1D:
     case 0x1E:
     case 0x1F:
       intrinsic_nop();
       break;
 
-    case 0x20:
+    case 0x20: /* 32 Maskable Interrupt Generation -------------------------- */
+      zprintf(" + " DUMP_REGSUB " = %s\n", "GENCTC0IRQ", uiValue & (1 << 0) ? sKEY_ON : sKEY_OFF);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "GENCTC1IRQ", uiValue & (1 << 1) ? sKEY_ON : sKEY_OFF);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "GENCTC2IRQ", uiValue & (1 << 2) ? sKEY_ON : sKEY_OFF);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "GENCTC3IRQ", uiValue & (1 << 3) ? sKEY_ON : sKEY_OFF);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "GENULAIRQ",  uiValue & (1 << 6) ? sKEY_ON : sKEY_OFF);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "GENLINEIRQ", uiValue & (1 << 7) ? sKEY_ON : sKEY_OFF);
+      break;
+
     case 0x21:
-    case 0x22:
+      intrinsic_nop();
+      break;
+
+    case 0x22: /* 34 Line Interrupt Control --------------------------------- */
+      zprintf(" + " DUMP_REGSUB " = 0x%03X\n", "LINEIRQVALM", ((uint16_t) (uiValue & (1 << 0))) << 8);
+      zprintf(" + " DUMP_REGSUB " = %s\n",     "ENABLINEIRQ", uiValue & (1 << 1) ? sKEY_ON   : sKEY_OFF);
+      zprintf(" + " DUMP_REGSUB " = %s\n",     "DISABULAIRQ", uiValue & (1 << 2) ? sKEY_ON   : sKEY_OFF);
+      zprintf(" + " DUMP_REGSUB " = %s\n",     "ULAIRQSIGNL", uiValue & (1 << 7) ? sKEY_TRUE : sKEY_FALSE);
+      break;
+
     case 0x23:
     case 0x24:
     case 0x25:
