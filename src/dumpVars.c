@@ -318,6 +318,13 @@ int dumpVariables(void)
         zprintf("   + " DUMP_VARSUB " = %s\n", "EXECMODE",  value.uiRaw8[0] & (1 << 7) ? "execution"   : "syn.check" );
         break;
 
+      case 0x5C3C: /* TV-FLAG */
+        zprintf("   + " DUMP_VARSUB " = %s\n", "PRTLOWSCR", value.uiRaw8[0] & (1 << 0) ? sKEY_TRUE : sKEY_FALSE);
+        zprintf("   + " DUMP_VARSUB " = %s\n", "INMODCHNG", value.uiRaw8[0] & (1 << 3) ? sKEY_TRUE : sKEY_FALSE);
+        zprintf("   + " DUMP_VARSUB " = %s\n", "AUTOMLIST", value.uiRaw8[0] & (1 << 4) ? sKEY_TRUE : sKEY_FALSE);
+        zprintf("   + " DUMP_VARSUB " = %s\n", "LOWSCRCLR", value.uiRaw8[0] & (1 << 5) ? sKEY_TRUE : sKEY_FALSE);
+        break;
+
       case 0x5C41: /* MODE */
         {
           const char_t* acModes[] = {"C|K|L", "E", "G", ""};
@@ -337,6 +344,11 @@ int dumpVariables(void)
         zprintf("   + " DUMP_VARSUB " = %s\n", "CHNKINUSE", value.uiRaw8[0] & (1 << 4) ? sKEY_TRUE : sKEY_FALSE);
         break;
 
+      case 0x5C7D: /* COORDS */
+        zprintf("   + " DUMP_VARSUB " = %u\n", "x", value.uiRaw8[0]);
+        zprintf("   + " DUMP_VARSUB " = %u\n", "y", value.uiRaw8[1]);
+        break;
+
       case 0x5C8D: /* ATTR_P */
       case 0x5C8F: /* ATTR_T */
         zprintf("   + " DUMP_VARSUB " = %u\n", "FLASH",   value.uiRaw8[0] & (1 << 7) ? 1 : 0);
@@ -350,6 +362,17 @@ int dumpVariables(void)
       case 0x5C8A: /* S_POSNL */
         zprintf("   + " DUMP_VARSUB " = %u\n", "COL", value.uiRaw8[0]);
         zprintf("   + " DUMP_VARSUB " = %u\n", "ROW", value.uiRaw8[1]);
+        break;
+
+      case 0x5C91: /* P-FLAG */
+        zprintf("   + " DUMP_VARSUB " = %s\n", "OVER.TEMP", value.uiRaw8[0] & (1 << 0) ? sKEY_TRUE : sKEY_FALSE);
+        zprintf("   + " DUMP_VARSUB " = %s\n", "OVER.PERM", value.uiRaw8[0] & (1 << 1) ? sKEY_TRUE : sKEY_FALSE);
+        zprintf("   + " DUMP_VARSUB " = %s\n", "INV.TEMP",  value.uiRaw8[0] & (1 << 2) ? sKEY_TRUE : sKEY_FALSE);
+        zprintf("   + " DUMP_VARSUB " = %s\n", "INV.PERM",  value.uiRaw8[0] & (1 << 3) ? sKEY_TRUE : sKEY_FALSE);
+        zprintf("   + " DUMP_VARSUB " = %s\n", "INK9.TEMP", value.uiRaw8[0] & (1 << 4) ? sKEY_TRUE : sKEY_FALSE);
+        zprintf("   + " DUMP_VARSUB " = %s\n", "INK9.PERM", value.uiRaw8[0] & (1 << 5) ? sKEY_TRUE : sKEY_FALSE);
+        zprintf("   + " DUMP_VARSUB " = %s\n", "PAP9.TEMP", value.uiRaw8[0] & (1 << 6) ? sKEY_TRUE : sKEY_FALSE);
+        zprintf("   + " DUMP_VARSUB " = %s\n", "PAP9.PERM", value.uiRaw8[0] & (1 << 7) ? sKEY_TRUE : sKEY_FALSE);
         break;
 
       default:
