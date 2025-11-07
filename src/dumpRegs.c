@@ -97,7 +97,9 @@ const regentry_t g_tRegisters[] =
   {0x1E, 0x00, "ACTVIDLNMSB"},
   {0x1F, 0x00, "ACTVIDLNLSB"},
   {0x20, 0x00, "MASKINTGNRT"},
-  {0x22, 0x00, "LINEINTCTRL"},
+  {0x22, 0x00, "LINEIRQCTRL"},
+  {0x23, 0x00, "LINEIRQVALL"},
+/*{0x24, 0x00, "RESERVED"   },*/
   {0x26, 0x00, "ULAHSCRCTRL"},
   {0x27, 0x00, "ULAVSCRCTRL"},
   {0x28, 0x00, "PS2KYMPADMB"},
@@ -193,6 +195,7 @@ const regentry_t g_tRegisters[] =
   {0xC4, 0x00, "IRQENABLES0"},
   {0xC5, 0x00, "IRQENABLES1"},
   {0xC6, 0x00, "IRQENABLES2"},
+/*{0xC7, 0x00, "RESERVED"   },*/
   {0xC8, 0x00, "IRQSTATUS0" },
   {0xC9, 0x00, "IRQSTATUS1" },
   {0xCA, 0x00, "IRQSTATUS2" },
@@ -200,7 +203,7 @@ const regentry_t g_tRegisters[] =
   {0xCC, 0x00, "DMAIRQENAB0"},
   {0xCD, 0x00, "DMAIRQENAB1"},
   {0xCE, 0x00, "DMAIRQENAB2"},
-  {0xCF, 0x00, "RESERVED"   },
+/*{0xCF, 0x00, "RESERVED"   },*/
   {0xD8, 0x00, "IOTRAPS"    },
   {0xD9, 0x00, "IOTRAPSWR"  },
   {0xDA, 0x00, "IOTRAPCAUSE"},
@@ -208,7 +211,7 @@ const regentry_t g_tRegisters[] =
   {0xF8, 0x00, "XADC"       },
   {0xF9, 0x00, "XADCD0"     },
   {0xFA, 0x00, "XADCD1"     },
-  {0xFF, 0x00, "RESERVED"   },
+/*{0xFF, 0x00, "RESERVED"   },*/
   /* ---------------------- */
   {0x00, 0x00, NULL         }
 };
