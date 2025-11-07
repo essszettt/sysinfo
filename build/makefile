@@ -52,7 +52,7 @@ CFLAGS += --c-code-in-asm
 CFLAGS += -D__DEBUG__
 else ifeq ($(BUILD), release)
 # speed vs. code quality
-CFLAGS += --max-allocs-per-node10000
+# CFLAGS += --max-allocs-per-node10000
 endif
 
 ### Linker Options #####################
