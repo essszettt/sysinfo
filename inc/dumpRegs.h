@@ -43,8 +43,19 @@
 /*============================================================================*/
 /*                               Defines                                      */
 /*============================================================================*/
+/*!
+Formatz string to define the output of nreg numbers
+*/
 #define DUMP_REGNUM  "%02X"
+
+/*!
+Formatstring to specify output of nreg names
+*/
 #define DUMP_REGNAME "%-11s"
+
+/*!
+Formatstring to specify output of nreg subtopics
+*/
 #define DUMP_REGSUB  "%-11s"
 
 /*============================================================================*/
@@ -67,11 +78,23 @@
 /*                               Typ-Definitionen                             */
 /*============================================================================*/
 /*!
+Structure of a entry in the list of registers to be dumped
 */
 typedef struct _regentry
 {
+  /*!
+  Number of nreg
+  */
   const uint8_t uiNumber;
+
+  /*!
+  Special flags to to signal various output formats
+  */
   const uint8_t uiFlags;
+
+  /*!
+  Name of a nreg
+  */
   const char_t* acName;
 } regentry_t;
 
@@ -80,6 +103,7 @@ typedef struct _regentry
 /*============================================================================*/
 /*!
 Output all information about registers of the Next
+@return EOK = "no error"
 */
 int dumpRegisters(void);
 

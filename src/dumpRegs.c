@@ -242,18 +242,38 @@ inline bool between(int iVal, int iMin, int iMax)
 }
 
 /*!
+To improve compilation speed, a really big switch-case was split in smaller
+ones ("divide et impera"). This function decodes the nregs 0x00 - 0x3F.
+@param uiRegNum Number of the nreg to decode
+@param uiValue  Current value of the nreg
+@return EOK = "no error"
 */
 static int dumpRegister_00_3F(uint8_t uiRegNum, uint8_t uiValue);
 
 /*!
+To improve compilation speed, a really big switch-case was split in smaller
+ones ("divide et impera"). This function decodes the nregs 0x40 - 0x7F.
+@param uiRegNum Number of the nreg to decode
+@param uiValue  Current value of the nreg
+@return EOK = "no error"
 */
 static int dumpRegister_40_7F(uint8_t uiRegNum, uint8_t uiValue);
 
 /*!
+To improve compilation speed, a really big switch-case was split in smaller
+ones ("divide et impera"). This function decodes the nregs 0x80 - 0xBF.
+@param uiRegNum Number of the nreg to decode
+@param uiValue  Current value of the nreg
+@return EOK = "no error"
 */
 static int dumpRegister_80_BF(uint8_t uiRegNum, uint8_t uiValue);
 
 /*!
+To improve compilation speed, a really big switch-case was split in smaller
+ones ("divide et impera"). This function decodes the nregs 0xC0 - 0xFF.
+@param uiRegNum Number of the nreg to decode
+@param uiValue  Current value of the nreg
+@return EOK = "no error"
 */
 static int dumpRegister_C0_FF(uint8_t uiRegNum, uint8_t uiValue);
 
