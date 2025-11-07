@@ -27,10 +27,7 @@ INC_DIR = ../inc
 BUILD_DIR = .
 
 ### Source Files #######################
-SRCS  = $(SRC_DIR)/main.c
-SRCS += $(SRC_DIR)/dumpDos.c
-SRCS += $(SRC_DIR)/dumpRegs.c
-SRCS += $(SRC_DIR)/dumpVars.c
+SRCS := $(wildcard $(SRC_DIR)/*.c)
 
 ### Compiler Options ###################
 CFLAGS = -compiler=sdcc --vc -clib=sdcc_iy -SO3 --opt-code-size -I$(INC_DIR) -pragma-include:$(INC_DIR)/zpragma.inc
