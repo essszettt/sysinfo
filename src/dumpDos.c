@@ -89,6 +89,11 @@
 /*----------------------------------------------------------------------------*/
 /* dumpOperatingSystem()                                                      */
 /*----------------------------------------------------------------------------*/
+#if defined(__SDCC)
+#pragma save
+/* warning 110: conditional flow changed by optimizer: so said EVELYN ... */
+#pragma disable_warning 110
+#endif
 int dumpOperatingSystem(void)
 {
   int iReturn = EOK;
@@ -363,6 +368,9 @@ int dumpOperatingSystem(void)
 
   return iReturn;
 }
+#if defined(__SDCC)
+#pragma restore
+#endif
 
 
 /*----------------------------------------------------------------------------*/
