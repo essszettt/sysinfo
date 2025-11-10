@@ -585,7 +585,7 @@ static int dumpRegister_00_3F(uint8_t uiRegNum, uint8_t uiValue)
     case 0x12: /* 18 Layer 2 active RAM bank ---------------------------- */ 
     case 0x13: /* 19 Layer 2 shadow RAM bank ---------------------------- */
       uiValue32 = UINT32_C(0x4000) * ((uint32_t) uiValue & 0x7F); // physical address
-      zprintf(" + " DUMP_REGSUB " = BANK16:%02X (%06lX)\n", "START", 
+      zprintf(" + " DUMP_REGSUB " = BANK:%02X (%06lX)\n", "START", 
               uiValue, uiValue32);
       break;
 
@@ -747,8 +747,8 @@ static int dumpRegister_40_7F(uint8_t uiRegNum, uint8_t uiValue)
       }
       else
       {
-        uiValue32 = UINT32_C(0x2000) * uiValue;               // physical address
-        zprintf(" + " DUMP_REGSUB " = (%04X-%04X) => BANK8:%02X (%06lX-%06lX)\n",
+        uiValue32 = UINT32_C(0x2000) * uiValue; // physical address
+        zprintf(" + " DUMP_REGSUB " = (%04X-%04X) => PAGE:%02X (%06lX-%06lX)\n",
                 "MAPPING", 
                 uiValue16, uiValue16 + 0x1FFF,
                 uiValue,
