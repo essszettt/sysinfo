@@ -102,6 +102,7 @@ and linked in debug-builds ("#define __DEBUG__").
 #define sKEY_DISABLED "disabled"
 #define sKEY_FIRST    "first"
 #define sKEY_SECOND   "second"
+#define sKEY_UNKNOWN  "unknown"
 
 /*============================================================================*/
 /*                               Namespaces                                   */
