@@ -53,6 +53,17 @@
 /*============================================================================*/
 /*                               Defines                                      */
 /*============================================================================*/
+/*!
+Name of the environment variable that holds the search path for executable
+files.
+*/
+#define sENVVAR_PATH "PATH"
+
+/*!
+Name of the environment variable that holds the pathname of the directory for
+temporary files.
+*/
+#define sENVVAR_TMP  "TMP"
 
 /*============================================================================*/
 /*                               Namespaces                                   */
@@ -362,8 +373,8 @@ int dumpOperatingSystem(void)
   // Environment variables
   if (EOK == iReturn)
   {
-    zprintf(DUMP_NOSNAME " = \"%s\"\n", "ENV.PATH", getenv("path"));
-    zprintf(DUMP_NOSNAME " = \"%s\"\n", "ENV.TMP",  getenv("tmp"));
+    zprintf(DUMP_NOSNAME " = \"%s\"\n", "ENV.PATH", getenv(sENVVAR_PATH));
+    zprintf(DUMP_NOSNAME " = \"%s\"\n", "ENV.TMP",  getenv(sENVVAR_TMP));
   }
 
   return iReturn;
