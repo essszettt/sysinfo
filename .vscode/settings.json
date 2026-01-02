@@ -17,7 +17,8 @@
         "ctype.h": "c",
         "stdbool.h": "c",
         "stdint.h": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "dumpvars.h": "c"
     },
     "C_Cpp.default.includePath": [
         "${z88dk}\\z88dk\\include"

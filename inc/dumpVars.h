@@ -103,60 +103,6 @@ Output all information about system variables of the Next
 */
 int dumpVariables(void);
 
-/*!
-Mit dieser Funktion kann eine numerischer Wert in eine hexadezimale Ziffer
-transformiert werden.
-@param uiValue Zu transformierender Wert (nur das Low-Nibble wird verwendet)
-@return Transformierte Hexadezimalziffer
-*/
-char_t nibble2hex(uint8_t uiValue);
-
-/*!
-Mit dieser Funktion kann eine Hex-Darstellung (als String) eines beliebigen
-Speicherbereichs erzeugt werden.
-@param pData Zeiger auf den Quellspeicherbereich
-@param uiSize Laenge des darzustellenden Speicherbereichs in [byte]
-@param acBuffer Zeiger auf den Zielpuffer, in dem der erzeugte String
-                gespeichert werden soll.
-@param uiBufferSize Laenge des Zielpuffers in [byte]
-@param uiGrouping Anzahl der "Bytes" im Zielstring, nach denen jeweils ein
-                  Leerzeichen zur Gruppierung eingefuegt werden soll.
-@return Laenge des erzeugten Strings _OHNE_ abschliessende Null.
-@remark Der erzeugte String wird auf jeden Fall mit "0" terminiert !
-
-@code
- Beispiel
-==========
-
-#include <iostream>
-#include "PTypes.h"
-
-int main(int argc, char* argv[])
-{
-  P_UINT8 pSrc[10];
-  P_CHARACTER acDest[64];
-
-  snprintf((char*) pSrc, sizeof(pSrc), "ABCDEFGHIJ");
-
-  P_UINT32 uiSize = 0;
-
-  uiSize = mem2hex(pSrc, sizeof(pSrc), acDest, sizeof(acDest), 2);
-  std::cout << "Laenge: " << uiSize << ": " << acDest << std::endl;
-
-  return 0;
-}
-
-Ausgabe:
-"Laenge: 25: 4142 4344 4546 4748 4900"
-
-@endcode
-*/
-unsigned long mem2hex(const void* const pData,
-                      unsigned long uiSize,
-                      char_t* acBuffer,
-                      unsigned long uiBufferSize,
-                      unsigned long uiGrouping);
-
 /*============================================================================*/
 /*                               Klassen                                      */
 /*============================================================================*/

@@ -9,7 +9,10 @@ APPNAME := sysinfo
 ### Binary type ########################
 APPTYPE := dotn
 
-### OS specific settings ###############
+### Tool Commands ######################
+CC := zcc
+LD := zcc
+
 ifeq ($(OS),Windows_NT)
 RM := rm -f
 MV := mv -f
@@ -22,18 +25,19 @@ endif
 BUILD ?= release
 
 ### Directories ########################
-SRC_DIR = ../src
-INC_DIR = ../inc
-BUILD_DIR = .
+SRC_DIR := ../src
+INC_DIR := ../inc
+BLD_DIR := .
+LIB_DIR := ../lib
 
 ### Source Files #######################
 SRCS := $(wildcard $(SRC_DIR)/*.c)
+OBJS := $(patsubst $(SRC_DIR)/%.c,$(BLD_DIR)/%.o,$(SRCS))
 
 ### Compiler Options ###################
-CFLAGS = -compiler=sdcc --vc -clib=sdcc_iy -SO3 --opt-code-size -I$(INC_DIR) -pragma-include:$(INC_DIR)/zpragma.inc
-
-# Selecting CRT
-CFLAGS += -startup=30
+CFLAGS := -compiler=sdcc --vc -SO3 --opt-code-size
+CFLAGS += -I$(INC_DIR) 
+CFLAGS += -I$(LIB_DIR)/libzxn/inc
 
 # verbose output
 # CFLAGS += -v
@@ -53,7 +57,12 @@ else ifeq ($(BUILD), release)
 endif
 
 ### Linker Options #####################
-LDFLAGS = -subtype=dotn -Cz"--clean" -o$(BUILD_DIR)/$(APPNAME) -create-app
+LDFLAGS := -subtype=$(APPTYPE) -clib=sdcc_iy -Cz"--clean" -o$(BLD_DIR)/$(APPNAME) -create-app
+LDFLAGS += -pragma-include:$(INC_DIR)/zpragma.inc
+LDFLAGS += -L$(LIB_DIR)/libzxn/build -llibzxn
+
+# Selecting CRT
+LDFLAGS += -startup=30
 
 ifeq ($(BUILD), debug)
 # create map file
@@ -63,25 +72,30 @@ LDFLAGS += -m
 LDFLAGS += -s
 endif
 
-### Compiler Command ###################
-CC = zcc +$(TARGET) $(CFLAGS) $(SRCS) $(LDFLAGS)
-
 ### Create build target ################
-all:
-	$(CC)
+all: libzxn $(OBJS)
+	$(LD) +$(TARGET) $(LDFLAGS) $(OBJS)
   # Why fucking hell does ZCC not use the full name ?? 
 ifeq ($(APPTYPE), dotn)
 ifeq ($(OS),Windows_NT)
-	@$(RM) $(BUILD_DIR)/$(APPNAME)
-	@$(MV) $(BUILD_DIR)/SYSINF $(BUILD_DIR)/$(APPNAME)
+	@$(RM) $(BLD_DIR)/$(APPNAME)
+	@$(MV) $(BLD_DIR)/SYSINF $(BLD_DIR)/$(APPNAME)
 endif
 endif
 
+libzxn:
+	$(MAKE) -C $(LIB_DIR)/libzxn/build BUILD=$(BUILD)
+
+$(BLD_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) +$(TARGET) $(CFLAGS) -c $< -o $@
+
 ### Cleanup build files ################
 clean:
-	@$(RM) $(BUILD_DIR)/$(APPNAME)
-	@$(RM) $(wildcard $(BUILD_DIR)/*.lis)
-	@$(RM) $(wildcard $(BUILD_DIR)/*.map)
-	@$(RM) $(wildcard $(BUILD_DIR)/*.sym)
+	@$(RM) $(BLD_DIR)/$(APPNAME)
+	@$(RM) $(wildcard $(BLD_DIR)/*.o)
+	@$(RM) $(wildcard $(BLD_DIR)/*.lis)
+	@$(RM) $(wildcard $(BLD_DIR)/*.map)
+	@$(RM) $(wildcard $(BLD_DIR)/*.sym)
 	@$(RM) $(wildcard $(SRC_DIR)/*.lis)
 	@$(RM) $(wildcard $(SRC_DIR)/*.sym)
+	@$(MAKE) -C $(LIB_DIR)/libzxn/build clean

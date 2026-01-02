@@ -228,20 +228,6 @@ const regentry_t g_tRegisters[] =
 /*                               Prototypen                                   */
 /*============================================================================*/
 /*!
-This function checks if a given value is between the limits of a given interval
-(iMin <= iVal <= iMax).
-@param iVal Value to check
-@param iMin Lower limit of the interval
-@param iMax Upper limit of the interval
-@return "true" - value is within the interval;
-        "false" - value is outside of interval
-*/
-inline bool between(int iVal, int iMin, int iMax)
-{
-  return (iMin <= iVal) && (iVal <= iMax);
-}
-
-/*!
 To improve compilation speed, a really big switch-case was split in smaller
 ones ("divide et impera"). This function decodes the nregs 0x00 - 0x3F.
 @param uiRegNum Number of the nreg to decode
@@ -313,19 +299,19 @@ int dumpRegisters(void)
             (very-very-very long time to compile) ...         S.Zell, 10/25/2025
     */
 
-    if (between(pReg->uiNumber, 0x00, 0x3F)) /* ============================= */
+    if (ZXN_BETWEEN(pReg->uiNumber, 0x00, 0x3F)) /* ============================= */
     {
       dumpRegister_00_3F(pReg->uiNumber, uiValue);
     }
-    else if (between(pReg->uiNumber, 0x40, 0x7F)) /* ======================== */
+    else if (ZXN_BETWEEN(pReg->uiNumber, 0x40, 0x7F)) /* ======================== */
     {
       dumpRegister_40_7F(pReg->uiNumber, uiValue);
     }
-    else if (between(pReg->uiNumber, 0x80, 0xBF)) /* ======================== */
+    else if (ZXN_BETWEEN(pReg->uiNumber, 0x80, 0xBF)) /* ======================== */
     {
       dumpRegister_80_BF(pReg->uiNumber, uiValue);
     }
-    else if (between(pReg->uiNumber, 0xC0, 0xFF)) /* ======================== */
+    else if (ZXN_BETWEEN(pReg->uiNumber, 0xC0, 0xFF)) /* ======================== */
     {
       dumpRegister_C0_FF(pReg->uiNumber, uiValue);
     }

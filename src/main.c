@@ -43,9 +43,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <errno.h>
-#include <time.h>
 #include <ctype.h>
-
 #include <arch/zxn.h>
 #include <arch/zxn/esxdos.h>
 
@@ -58,7 +56,6 @@
 /*============================================================================*/
 /*                               Defines                                      */
 /*============================================================================*/
-#define END_OF_LIST (0x7FFF)
 
 /*============================================================================*/
 /*                               Namespaces                                   */
@@ -140,35 +137,6 @@ static struct _state
 
 } g_tState;
 
-/*!
-List of all errormessages (and codes) that can be sent to NextOS at return
-*/
-const errentry_t g_tErrTable[] =
-{
-  {EOK,         "no erro"                   "\xF2"}, /* 'r' | 0x80 */
-  {EACCES,      "access denie"              "\xE4"}, /* 'd' | 0x80 */
-  {EBADF,       "bad fil"                   "\xE5"}, /* 'e' | 0x80 */
-  {EBDFD,       "bad file descripto"        "\xF2"}, /* 'r' | 0x80 */
-  {EDOM,        "out of domain of functio"  "\xEE"}, /* 'n' | 0x80 */
-  {EFBIG,       "file too larg"             "\xE5"}, /* 'e' | 0x80 */
-  {EINVAL,      "invalid valu"              "\xE5"}, /* 'e' | 0x80 */
-  {EMFILE,      "too many open file"        "\xE5"}, /* 'e' | 0x80 */
-  {ENFILE,      "too many open files in syste\xED"}, /* 'm' | 0x80 */
-  {ENOLCK,      "no locks availabl"         "\xE5"}, /* 'e' | 0x80 */
-  {ENOMEM,      "out of me"                 "\xED"}, /* 'm' | 0x80 */
-  {ENOTSUP,     "not supporte"              "\xE4"}, /* 'd' | 0x80 */
-  {EOVERFLOW,   "overflo"                   "\xEF"}, /* 'w' | 0x80 */
-  {ERANGE,      "out of rang"               "\xE5"}, /* 'e' | 0x80 */
-  {ESTAT,       "bad stat"                  "\xF4"}, /* 't' | 0x80 */
-  {EAGAIN,      "resource temp. unavailabl" "\xE5"}, /* 'e' | 0x80 */
-  {EWOULDBLOCK, "operation would bloc"      "\xEB"}, /* 'k' | 0x80 */
-  /* ---------------- APPLICATION SPECIFIC ----------------------- */
-  {EBREAK,      "D BREAK - no repea"        "\xF4"}, /* 't' | 0x80 */
-  {ETIMEOUT,    "timeout erro"              "\xF2"}, /* 'r' | 0x80 */
-  /* ---------------- END-OF-LIST -------------------------------- */
-  {END_OF_LIST, "unknown erro"              "\xF2"}  /* 'r' | 0x80 */
-};
-
 /*============================================================================*/
 /*                               Strukturen                                   */
 /*============================================================================*/
@@ -212,7 +180,7 @@ int showInfo(void);
 /*!
 Read, detect and show system information
 */
-static int dumpSystemInfo(void);
+int dumpSystemInfo(void);
 
 /*============================================================================*/
 /*                               Klassen                                      */
@@ -231,12 +199,12 @@ void _construct(void)
   g_tState.bForce        = false;
   g_tState.bQuiet        = false;
   g_tState.uiFeatures    = 0xFF;
-  g_tState.uiCpuSpeed    = ZXN_READ_REG(REG_TURBO_MODE);
+  g_tState.uiCpuSpeed    = zxn_getspeed();
   g_tState.dump.acPathName[0] = '\0';
   g_tState.dump.hFile    = INV_FILE_HND;
   g_tState.iExitCode     = EOK;
 
-  ZXN_NEXTREG(REG_TURBO_MODE, RTM_28MHZ);
+  zxn_setspeed(RTM_28MHZ);
 
   if (0 != esx_ide_mode_get(&g_tState.tScreen))
   {
@@ -244,7 +212,7 @@ void _construct(void)
     g_tState.tScreen.rows = 24;
   }
 
-  g_tState.bInitialized  = true;
+  g_tState.bInitialized = true;
 }
 
 
@@ -255,7 +223,8 @@ void _destruct(void)
 {
   if (g_tState.bInitialized)
   {
-    ZXN_NEXTREGA(REG_TURBO_MODE, g_tState.uiCpuSpeed & 0x03);
+    zxn_setspeed(g_tState.uiCpuSpeed);
+    g_tState.bInitialized = false;
   }
 }
 
@@ -402,7 +371,7 @@ int parseArguments(int argc, char_t* argv[])
 /*----------------------------------------------------------------------------*/
 /* dumpSystemInfo()                                                           */
 /*----------------------------------------------------------------------------*/
-static int dumpSystemInfo(void)
+int dumpSystemInfo(void)
 {
   int iReturn = EOK;
 
@@ -422,7 +391,7 @@ static int dumpSystemInfo(void)
         while (uiIdx < 0xFFFF)
         {
           snprintf(acPathName, sizeof(acPathName),
-                  "%s" ESX_DIR_SEP VER_INTERNALNAME_STR "-%u.txt",
+                  "%s" ESX_DIR_SEP APP_INTERNALNAME_STR "-%u.txt",
                   g_tState.dump.acPathName,
                   uiIdx);
 
@@ -499,7 +468,7 @@ static int dumpSystemInfo(void)
 
   if (EOK == iReturn)
   {
-    zheader("%s (version " VER_FILEVERSION_STR ")", strupr(VER_INTERNALNAME_STR));
+    zheader("%s (version " APP_VERSION_STR ")", strupr(APP_INTERNALNAME_STR));
   }
 
   if (INV_FILE_HND != g_tState.dump.hFile)
@@ -518,10 +487,10 @@ static int dumpSystemInfo(void)
 int showHelp(void)
 {
   char_t acAppName[0x10];
-  strncpy(acAppName, VER_INTERNALNAME_STR, sizeof(acAppName));
+  strncpy(acAppName, APP_INTERNALNAME_STR, sizeof(acAppName));
   strupr(acAppName);
 
-  printf("%s\n\n", VER_FILEDESCRIPTION_STR);
+  printf("%s\n\n", APP_DESCRIPTION_STR);
 
   printf("%s file [-t rvo][-f][-q][-h][-v]\n\n", acAppName);
   //      0.........1.........2.........3.
@@ -542,13 +511,28 @@ int showHelp(void)
 /*----------------------------------------------------------------------------*/
 int showInfo(void)
 {
-  char_t acAppName[0x10];
-  strncpy(acAppName, VER_INTERNALNAME_STR, sizeof(acAppName));
-  strupr(acAppName);
+  uint16_t uiVersion;
+  char_t acBuffer[0x10];
 
-  printf("%s " VER_LEGALCOPYRIGHT_STR "\n", acAppName);
+  strncpy(acBuffer, APP_INTERNALNAME_STR, sizeof(acBuffer));
+  strupr(acBuffer);
+
+  printf("%s " APP_LEGALCOPYRIGHT_STR "\n", acBuffer);
+
+  if (ESX_DOSVERSION_NEXTOS_48K != (uiVersion = esx_m_dosversion()))
+  {
+    snprintf(acBuffer, sizeof(acBuffer), "NextOS %u.%02u",
+             ESX_DOSVERSION_NEXTOS_MAJOR(uiVersion),
+             ESX_DOSVERSION_NEXTOS_MINOR(uiVersion));
+  }
+  else
+  {
+    strncpy(acBuffer, "48K mode", sizeof(acBuffer));
+  }
+
   //      0.........1.........2.........3.
-  printf(" Version %s\n", VER_FILEVERSION_STR);
+  printf(" Version %s (%s)\n", APP_VERSION_STR, acBuffer);
+  printf(" Version %s (libzxn)\n", ZXN_VERSION_STR);
   printf(" Stefan Zell (info@diezells.de)\n");
 
   return EOK;
@@ -588,7 +572,7 @@ int zprintf(const char_t* acFmt, ...)
 
 
 /*----------------------------------------------------------------------------*/
-/* _strerror()                                                                */
+/* zheader()                                                                  */
 /*----------------------------------------------------------------------------*/
 int zheader(const char_t* acFmt, ...)
 {
@@ -629,128 +613,11 @@ int zheader(const char_t* acFmt, ...)
 
 
 /*----------------------------------------------------------------------------*/
-/* zxn_strerror()                                                             */
-/*----------------------------------------------------------------------------*/
-const char_t* zxn_strerror(int iCode)
-{
-  const errentry_t* pIndex = g_tErrTable;
-
-  while (END_OF_LIST != pIndex->iCode)
-  {
-    if (iCode == pIndex->iCode)
-    {
-      break;
-    }
-
-    ++pIndex;
-  }
-
-  return pIndex->acText;
-}
-
-
-/*----------------------------------------------------------------------------*/
-/* zxn_frames()                                                               */
-/*----------------------------------------------------------------------------*/
-uint32_t zxn_frames(uint8_t* pFrames)
-{
-  union
-  {
-    uint32_t uiValue;
-    struct 
-    {
-      uint8_t uiRaw0;
-      uint8_t uiRaw1;
-      uint8_t uiRaw2;
-      uint8_t uiRaw3;
-    };
-  } frames;
-
-  frames.uiRaw0 = pFrames[0];
-  frames.uiRaw1 = pFrames[1];
-  frames.uiRaw2 = pFrames[2];
-  frames.uiRaw3 = 0;
-  
-  return frames.uiValue;
-}
-
-
-/*----------------------------------------------------------------------------*/
 /* _cpuspeed()                                                                */
 /*----------------------------------------------------------------------------*/
 uint8_t _cpuspeed(void)
 {
   return g_tState.uiCpuSpeed;
-}
-
-
-/*----------------------------------------------------------------------------*/
-/* zxn_normalizepath()                                                        */
-/*----------------------------------------------------------------------------*/
-int zxn_normalizepath(char_t* acPath)
-{
-  /*
-  ZX Spectrum Next Pfad-Normalisierung (in-place, joinbar)
-  - '\\' => '/'
-  - doppelte '/' zu einem '/'
-  - trailing '/' entfernen (ausser bei "/" => "/.")
-  - "/" wird zu "/."   (joinbar, aber bleibt im Root)
-  - "X:/" wird zu "X:"
-  Rueckgabe: EOK oder EINVAL bei Fehler.
-  */
-
-  if (NULL == acPath)
-  {
-    return EINVAL;
-  }
-
-  /* 1) '\' => '/' und doppelte '/' entfernen */
-  size_t r = 0, w = 0;
-  while ('\0' != acPath[r])
-  {
-    char_t c = acPath[r++];
-
-    if ('\\' == c)
-    {
-      c = '/';
-    }
-
-    if ('/' == c)
-    {
-      if ((0 < w) && ('/' == acPath[w - 1]))
-      {
-        continue;
-      }
-    }
-
-    acPath[w++] = c;
-  }
-
-  acPath[w] = '\0';
-
-  /* 2) Spezialfaelle fuer "joinbare" Basen */
-  if ((1 == w) && ('/' == acPath[0]))
-  {
-    /* "/" => "/." */
-    acPath[1] = '.';
-    acPath[2] = '\0';
-    return EOK;
-  }
-
-  if ((3 == w) && isalpha((char_t) acPath[0]) && (':' == acPath[1]) && ('/' == acPath[2]))
-  {
-    /* "X:/" => "X:" */
-    acPath[2] = '\0';
-    return EOK;
-  }
-
-  /* 3) Allgemein: trailing '/' entfernen */
-  while ((0 < w) && ('/' == acPath[w - 1]))
-  {
-    acPath[--w] = '\0';
-  }
-
-  return EOK;
 }
 
 

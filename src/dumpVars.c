@@ -40,7 +40,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <errno.h>
-
 #include <arch/zxn.h>
 #include <arch/zxn/sysvar.h>
 
@@ -198,12 +197,6 @@ static const varentry_t g_tVariables[] =
 };
 
 /*!
-Diese Tabelle dient zur effizienten Umrechnung eines numerischen Wertes in eine
-hexadezimale Zifffer (ASCII).
-*/
-static const char_t g_acHexDigits[] = "0123456789ABCDEF";
-
-/*!
 Buffer to render the value of system variable
 */
 static char_t g_acValue[VALUE_LEN_MAX];
@@ -289,7 +282,7 @@ int dumpVariables(void)
         break;
 
       default:
-        mem2hex(((uint8_t*) pVar->uiAddress), pVar->uiSize, g_acValue, sizeof(g_acValue), 1);
+        zxn_mem2hex(((uint8_t*) pVar->uiAddress), pVar->uiSize, g_acValue, sizeof(g_acValue), 1);
     }
 
     zprintf(DUMP_VARNUM "-" DUMP_VARNAME " = %s\n", pVar->uiAddress, pVar->acName, g_acValue);
@@ -383,83 +376,6 @@ int dumpVariables(void)
   }
 
   return iReturn;
-}
-
-
-/*----------------------------------------------------------------------------*/
-/* nibble2hex()                                                               */
-/*----------------------------------------------------------------------------*/
-char_t nibble2hex(uint8_t uiValue)
-{
-  return g_acHexDigits[uiValue & 0x0F];
-}
-
-
-/*----------------------------------------------------------------------------*/
-/* mem2hex()                                                                  */
-/*----------------------------------------------------------------------------*/
-unsigned long mem2hex(const void* const pData,
-                      unsigned long uiSize,
-                      char_t* acBuffer,
-                      unsigned long uiBufferSize,
-                      unsigned long uiGrouping)
-{
-  unsigned long uiReturn = 0;
-
-  if ((0 != acBuffer) && (0 != uiBufferSize))
-  {
-    acBuffer[0] = '\0';
-
-    if ((0 != pData) && (0 != uiSize))
-    {
-      char_t* pSrc     = (char_t*) pData;
-      char_t* pSrcEnd  = pSrc + uiSize;
-      char_t* pDest    = (char_t*) acBuffer;
-      char_t* pDestEnd = pDest + uiBufferSize - 1;
-
-      while (pSrc < pSrcEnd)
-      {
-        if (pDest < pDestEnd)
-        {
-          *pDest = nibble2hex(*pSrc >> 4);
-          ++pDest;
-        }
-
-        if (pDest < pDestEnd)
-        {
-          *pDest = nibble2hex(*pSrc);
-          ++pDest;
-        }
-
-        if (0 != uiGrouping)
-        {
-          if (0 == ((unsigned long)(pSrc - ((char_t*) pData) + 1) % uiGrouping))
-          {
-            if ((pDest < pDestEnd) && ((pSrc + 1) < pSrcEnd))
-            {
-              *pDest = ' ';
-              ++pDest;
-            }
-          }
-        }
-
-        if (pDest >= pDestEnd)
-        {
-          break;
-        }
-        else
-        {
-          ++pSrc;
-        }
-      }
-
-      *pDest = 0;
-
-      uiReturn = (unsigned long)(pDest - acBuffer);
-    }
-  }
-
-  return uiReturn;
 }
 
 
