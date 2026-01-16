@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------+
 |                                                                              |
 | filename: libzxn.h                                                           |
-| project:  ZX Spectrum Next - Common functions                                |
+| project:  ZX Spectrum Next - Common functions library                        |
 | author:   Stefan Zell                                                        |
 | date:     09/09/2025                                                         |
 |                                                                              |
@@ -42,7 +42,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <arch/zxn.h>
-#include <arch/zxn/esxdos.h>
 
 /*============================================================================*/
 /*                               Defines                                      */
@@ -52,10 +51,10 @@ Version information of the library
 */
 #define ZXN_VERSION_MAJOR       0
 #define ZXN_VERSION_MINOR       0
-#define ZXN_VERSION_PATCH       5
+#define ZXN_VERSION_PATCH       7
 #define ZXN_PRODUCTNAME_STR     "libzxn"
 #define ZXN_COMPANYNAME_STR     "STZ Engineering"
-#define ZXN_LEGALCOPYRIGHT_STR  "\x7F 2025 " VER_COMPANYNAME_STR
+#define ZXN_LEGALCOPYRIGHT_STR  "\x7F 2025 " ZXN_COMPANYNAME_STR
 
 /*!
 Beginning of project specific error codes.
@@ -78,7 +77,6 @@ Error code: Timeout in operation
   be corrected ...
   */
   #define ERANGE __ERANGE
-  #warning "ERANGE not defined in errno.h (typo ?)"
 #endif
 
 #ifndef RTM_28MHZ
@@ -86,7 +84,6 @@ Error code: Timeout in operation
   Missing constant for 28-Mhz-speed of ZXN (missing in <zxn.h>)
   */
   #define RTM_28MHZ 0x03
-  #warning "RTM_28MHZ not defined in zxn.h"
 #endif
 
 /*!
@@ -113,8 +110,12 @@ This macro checks if a given value is between the limits of a given interval
 
 /*!
 With this macro the value of a variable can be limited to the given interval.
+@param val Value to check
+@param min Lower limit of the interval
+@param max Upper limit of the interval
+@return COntrained value (min <= val <= max)
 */
-#define ZXN_CONSTRAIN(val, min, max) ((val) <= (min) ? (min) : (val) >= (max) ? (max) : (val))
+#define ZXN_CONSTRAIN(val, min, max) ((val) <= (min) ? (min) : ((val) >= (max) ? (max) : (val)))
 
 /*!
 This macro can be used like "printf" but it's implementation is only compiled
@@ -143,10 +144,6 @@ This macro delivers the version number of the library as a string literal
 #define ZXN_VERSION_STR ZXN_VER_STR(ZXN_VERSION_MAJOR) "." \
                         ZXN_VER_STR(ZXN_VERSION_MINOR) "." \
                         ZXN_VER_STR(ZXN_VERSION_PATCH)
-
-/*============================================================================*/
-/*                               Namespaces                                   */
-/*============================================================================*/
 
 /*============================================================================*/
 /*                               Konstanten                                   */
@@ -283,18 +280,33 @@ In this function cleans up the given path ('\\' => '/', remove trailing '/')
 int zxn_normalizepath(char_t* acPath);
 
 /*!
-This function sets the colour of the border by a call of the ROM-function
+This function sets the color of the border by a call of the ROM-function
 (in 48K-Spectrum-ROM)
-@param uiColour Colour of the border to set (0 .. 7)
+@param uiColor Colour of the border to set (0 .. 7)
 */
-void zxn_border_fastcall(uint8_t uiColour) __z88dk_fastcall;
+void zxn_border_fastcall(uint8_t uiColor) __preserves_regs(a,b,c,d,e,h,l,iyl,iyh) __z88dk_fastcall;
 #define zxn_border(x) zxn_border_fastcall(x)
 
 /*!
 This function clears the screen
 @param uiColor Color of the background ("paper color")
 */
-void zxn_cls(uint8_t uiColor) __z88dk_fastcall;
+void zxn_cls_fastcall(uint8_t uiColor) __z88dk_fastcall;
+#define zxn_cls(x) zxn_cls_fastcall(x)
+
+/*!
+Set the ink color for the next print commands on the screen.
+@param uiColor Color to set ("0" = BLACK ... "7" = WHITE)
+*/
+void zxn_ink_fastcall(uint8_t uiColor) __z88dk_fastcall;
+#define zxn_ink(x) zxn_ink_fastcall(x)
+
+/*!
+Set the paper color for the next print commands on the screen.
+@param uiColor Color to set ("0" = BLACK ... "7" = WHITE)
+*/
+void zxn_paper_fastcall(uint8_t uiColor) __z88dk_fastcall;
+#define zxn_paper(x) zxn_paper_fastcall(x)
 
 /*!
 Print at specified position on screen (upper left corner = 0,0).
@@ -394,10 +406,6 @@ size_t zxn_mem2hex(const void* const pData,
                    char_t* acBuffer,
                    size_t uiBufferSize,
                    uint8_t uiGrouping);
-
-/*============================================================================*/
-/*                               Klassen                                      */
-/*============================================================================*/
 
 /*============================================================================*/
 /*                               Implementierung                              */

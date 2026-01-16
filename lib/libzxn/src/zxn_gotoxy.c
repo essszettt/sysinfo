@@ -37,8 +37,13 @@
 /*                               Includes                                     */
 /*============================================================================*/
 #include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
+#if 1
+  #include <stdlib.h>
+  #include <stdio.h>
+#else
+  #include <arch/zxn.h>
+  #include <sys/ioctl.h>
+#endif
 #include "libzxn.h"
 
 /*============================================================================*/
@@ -104,11 +109,15 @@ void zxn_gotoxy(uint8_t uiX, uint8_t uiY)
   12/30/2025 SZ: If using offset "0", then "not implemented" for col|row=13 
   12/30/2025 SZ: If using offset "0", then output jumps by +2 for col|row=10 
   */
-
+#if 1
   fputc((int) 0x16, stdout);
   fputc((int) uiY,  stdout);
   fputc((int) uiX,  stdout);
   fflush(stdout);
+#else
+  /* #include <stropts.h> */
+  ioctl(1, IOCTL_OTERM_SET_CURSOR_COORD, uiX, uiY);
+#endif
 }
 
 
