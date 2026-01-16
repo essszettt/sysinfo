@@ -59,6 +59,8 @@ and the log file.
 #define sKEY_FIRST    "first"
 #define sKEY_SECOND   "second"
 #define sKEY_UNKNOWN  "unknown"
+#define sKEY_PRESSED  "pressed"
+#define sKEY_RELEASED "released"
 
 /*============================================================================*/
 /*                               Namespaces                                   */

@@ -8,7 +8,7 @@
 /* --- Produktversion --- */
 #define APP_VERSION_MAJOR     0
 #define APP_VERSION_MINOR     0
-#define APP_VERSION_PATCH     19
+#define APP_VERSION_PATCH     20
 
 #define APP_COMPANYNAME_STR   "STZ Engineering"
 #define APP_DESCRIPTION_STR   "System Info ZX Spectrum Next"

@@ -532,7 +532,7 @@ int showInfo(void)
 
   //      0.........1.........2.........3.
   printf(" Version %s (%s)\n", APP_VERSION_STR, acBuffer);
-  printf(" Version %s (libzxn)\n", ZXN_VERSION_STR);
+  printf(" Version %s (%s)\n", ZXN_VERSION_STR, ZXN_PRODUCTNAME_STR);
   printf(" Stefan Zell (info@diezells.de)\n");
 
   return EOK;

@@ -548,9 +548,9 @@ static int dumpRegister_00_3F(uint8_t uiRegNum, uint8_t uiValue)
       break;
 
     case 0x10: /* 10 Core Boot ------------------------------------------ */
-      zprintf(" + " DUMP_REGSUB " = %spressed\n", "NMIBUTTON",   uiValue & (1 << 0) ? "" : "not ");
-      zprintf(" + " DUMP_REGSUB " = %spressed\n", "DRIVEBUTTON", uiValue & (1 << 1) ? "" : "not ");
-      zprintf(" + " DUMP_REGSUB " = %u\n",        "COREID",     (uiValue >> 2) & 0x1F);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "NMIBUTTON",   uiValue & (1 << 0) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "DRIVEBUTTON", uiValue & (1 << 1) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %u\n", "COREID",     (uiValue >> 2) & 0x1F);
       break;
 
     case 0x11: /* 11 Video Timing --------------------------------------- */
@@ -859,8 +859,58 @@ static int dumpRegister_80_BF(uint8_t uiRegNum, uint8_t uiValue)
 {
   int iReturn = EOK;
 
+  const char_t* acValue = 0;
+
   switch (uiRegNum)
   {
+    case 0xA2: /* 162 Pi I2S Audio Control ---------------------------------- */
+      zprintf(" + " DUMP_REGSUB " = %s\n", "REDIRTOEAR", uiValue & (1 << 0) ? sKEY_TRUE : sKEY_FALSE);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "mute RIGHT", uiValue & (1 << 2) ? sKEY_TRUE : sKEY_FALSE);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "mute LEFT",  uiValue & (1 << 3) ? sKEY_TRUE : sKEY_FALSE);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "audio flow", uiValue & (1 << 4) ? "from Pi" : "to Pi");
+      switch ((uiValue >> 6) & 0x03)
+      {
+        case 0x00: acValue = sKEY_DISABLED;      break;
+        case 0x01: acValue = "mono (src RIGHT)"; break;
+        case 0x02: acValue = "mono (src LEFT)";  break;
+        default:   acValue = "stereo";
+      }
+      zprintf(" + " DUMP_REGSUB " = %s\n", "I2S state",  acValue);
+      break;
+
+    case 0xB0: /* 176 Extended Keys 0 --------------------------------------- */
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key RIGHT", uiValue & (1 << 0) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key LEFT",  uiValue & (1 << 1) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key DOWN",  uiValue & (1 << 2) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key UP",    uiValue & (1 << 3) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key .",     uiValue & (1 << 4) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key ,",     uiValue & (1 << 5) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key \"",    uiValue & (1 << 6) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key ;",     uiValue & (1 << 7) ? sKEY_PRESSED : sKEY_RELEASED);
+      break;
+
+    case 0xB1: /* 177 Extended Keys 1 --------------------------------------- */
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key EXTEND",  uiValue & (1 << 0) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key CAPSLCK", uiValue & (1 << 1) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key GRAPH",   uiValue & (1 << 2) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key TRUEVID", uiValue & (1 << 3) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key INVVID",  uiValue & (1 << 4) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key BREAK",   uiValue & (1 << 5) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key EDIT",    uiValue & (1 << 6) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "key DELETE",  uiValue & (1 << 7) ? sKEY_PRESSED : sKEY_RELEASED);
+      break;
+
+    case 0xB2: /* 178 Extended MD pad buttons ------------------------------- */
+      zprintf(" + " DUMP_REGSUB " = %s\n", "left START",  uiValue & (1 << 0) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "left Y",      uiValue & (1 << 1) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "left Z",      uiValue & (1 << 2) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "left X",      uiValue & (1 << 3) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "right START", uiValue & (1 << 4) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "right Y",     uiValue & (1 << 5) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "right Z",     uiValue & (1 << 6) ? sKEY_PRESSED : sKEY_RELEASED);
+      zprintf(" + " DUMP_REGSUB " = %s\n", "right X",     uiValue & (1 << 7) ? sKEY_PRESSED : sKEY_RELEASED);
+      break;
+
     default:
       uiValue = uiValue;
   }
