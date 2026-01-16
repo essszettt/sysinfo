@@ -20,3 +20,5 @@ lib/libzxn/build/zxn_reset.o
 lib/libzxn/build/zxn_rtrim.o
 lib/libzxn/build/zxn_sleep_ms.o
 lib/libzxn/build/zxn_version.o
+lib/libzxn/build/zxn_ink.o
+lib/libzxn/build/zxn_paper.o
