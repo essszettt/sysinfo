@@ -1,4 +1,4 @@
-.PHONY: all clean
+.PHONY: all clean push
 
 ### Target Platform ####################
 TARGET := zxn
@@ -20,6 +20,8 @@ else
 RM := rm -f
 MV := mv -f
 endif
+
+HDF := hdfmonkey
 
 ### Build Type #########################
 BUILD ?= release
@@ -88,6 +90,10 @@ libzxn:
 
 $(BLD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) +$(TARGET) $(CFLAGS) -c $< -o $@
+
+### Push to emulator image #############
+push:
+	$(HDF) put "$(ZXN_IMAGE_PATH)/$(ZXN_IMAGE_NAME)" $(APPNAME) "/dot"
 
 ### Cleanup build files ################
 clean:
