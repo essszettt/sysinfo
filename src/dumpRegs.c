@@ -429,9 +429,10 @@ static int dumpRegister_00_3F(uint8_t uiRegNum, uint8_t uiValue)
     case 0x06: /* 06 Peripheral 2 Settings ------------------------------ */
       switch (uiValue & 0x03)
       {
-        case 0x00: acValue = "YM"; break;
-        case 0x01: acValue = "AY"; break;
-        case 0x03: acValue = "Hold all PSGs in RESET"; break;
+        case 0x00: acValue = "YM2149F";   break;
+        case 0x01: acValue = "AY-3-8912"; break;
+        case 0x02: acValue = "ZXN-8950";  break;
+        case 0x03: acValue = "Hold all in RESET"; break;
         default:   acValue = sKEY_UNKNOWN;
       }
       zprintf(" + " DUMP_REGSUB " = %s\n",         "PSGMODECTRL", acValue);
