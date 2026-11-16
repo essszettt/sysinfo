@@ -543,6 +543,7 @@ static int dumpRegister_00_3F(uint8_t uiRegNum, uint8_t uiValue)
         case 0x00: acValue = "ZX Spectrum Next Issue 2"; break;
         case 0x01: acValue = "ZX Spectrum Next Issue 3"; break;
         case 0x02: acValue = "ZX Spectrum Next Issue 4"; break;
+        case 0x03: acValue = "ZX Spectrum Next Issue 5"; break;
         default:   acValue = sKEY_UNKNOWN;
       }
       zprintf(" + " DUMP_REGSUB " = %s\n", "REVISION", acValue);
